@@ -1,0 +1,21 @@
+"id","name","name_scientific","food_frequency"
+125,"Rice","Oryza sativa",2
+126,"Millet","Panicum miliaceum",2
+130,"Avocado","Persea americana",1
+141,"Common pea","Pisum sativum",1
+147,"European plum","Prunus domestica",1
+177,"Sorghum","Sorghum bicolor",2
+202,"Cowpea","Vigna unguiculata",1
+205,"Corn","Zea mays",2
+268,"Beer",NA,2
+334,"Chicken","Gallus gallus",1
+506,"Cattle (Beef, Veal)","Bos taurus",1
+549,"Domestic pig","Sus scrofa domestica",1
+632,"Milk (Cow)",NA,1
+633,"Eggs",NA,2
+667,"Butter",NA,1
+712,"Milk (Other mammals)",NA,1
+714,"Buttermilk",NA,1
+836,"Wheat bread",NA,1
+872,"Margarine",NA,1
+1019,"White bread",NA,1

@@ -1,0 +1,34 @@
+"food","score","raw_perc","perc","FooDB"
+"Butter",1.5,1.97368421052632,1,"Butter"
+"Margarine",1.5,1.97368421052632,1,"Margarine"
+"WholeMilk",1,1.31578947368421,1,"Milk (Cow)"
+"HodzekoAmasi",1,1.31578947368421,1,NA
+"Lacto",1,1.31578947368421,1,"Buttermilk"
+"GoatMilk",1,1.31578947368421,1,"Milk (Other mammals)"
+"SkimmedMilk",1,1.31578947368421,1,NA
+"Avocado",1.5,1.97368421052632,1,"Avocado"
+"Plum",1.5,1.97368421052632,1,"European plum"
+"Sugarbeans",1.33333333333333,1.75438596491228,1,NA
+"Nyemba",1.33333333333333,1.75438596491228,1,"Cowpea"
+"Peas",1.33333333333333,1.75438596491228,1,"Common pea"
+"Beef",1.5,1.97368421052632,1,"Cattle (Beef, Veal)"
+"Pork",1.5,1.97368421052632,1,"Domestic pig"
+"FriedChicken",1.5,1.97368421052632,1,NA
+"Chicken",1.5,1.97368421052632,1,"Chicken"
+"PeriPeriChicken",2.5,3.28947368421053,3,NA
+"Nandos",2.5,3.28947368421053,3,NA
+"Eggs",2,2.63157894736842,2,"Eggs"
+"Darkbread",1,1.31578947368421,1,"Wheat bread"
+"Whitebread",1,1.31578947368421,1,"White bread"
+"WhiteRice",2,2.63157894736842,2,"Rice"
+"SadzaRapoko",1.66666666666667,2.19298245614035,2,"Corn"
+"ZviyoMhunga",1.66666666666667,2.19298245614035,2,"Sorghum"
+"MapfundeMugaiwa",1.66666666666667,2.19298245614035,2,"Millet"
+"Cascade",1,1.31578947368421,1,NA
+"SoftDrinks",1,1.31578947368421,1,NA
+"Juice",1,1.31578947368421,1,NA
+"Maheu",1.5,1.97368421052632,1,"Beer"
+"TraditionalBeer",1.5,1.97368421052632,1,"Beer"
+"Sauces",2.5,3.28947368421053,3,NA
+"Dressing",2.5,3.28947368421053,3,NA
+"Biscuits",3,3.94736842105263,3,NA
