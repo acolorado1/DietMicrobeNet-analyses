@@ -1,0 +1,14 @@
+"id","name","name_scientific","food_frequency"
+16,"Peanut","Arachis hypogaea",5
+126,"Millet","Panicum miliaceum",1
+141,"Common pea","Pisum sativum",1
+177,"Sorghum","Sorghum bicolor",1
+202,"Cowpea","Vigna unguiculata",1
+205,"Corn","Zea mays",1
+268,"Beer",NA,4
+334,"Chicken","Gallus gallus",2
+506,"Cattle (Beef, Veal)","Bos taurus",1
+549,"Domestic pig","Sus scrofa domestica",1
+633,"Eggs",NA,3
+667,"Butter",NA,2
+872,"Margarine",NA,2

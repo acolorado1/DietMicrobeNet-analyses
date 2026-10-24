@@ -1,0 +1,28 @@
+"food","score","raw_perc","perc","FooDB"
+"Butter",2,2.85714285714286,2,"Butter"
+"Margarine",2,2.85714285714286,2,"Margarine"
+"Bakedbeans",1,1.42857142857143,1,"Common bean"
+"Cannedmushrooms",1,1.42857142857143,1,"Common mushroom"
+"GreenVegetables",1,1.42857142857143,1,NA
+"Fries",1,1.42857142857143,1,"Potato"
+"Friedpotatoes",1,1.42857142857143,1,"Potato"
+"Roastedpotatoes",1,1.42857142857143,1,"Potato"
+"Beef",2,2.85714285714286,2,"Cattle (Beef, Veal)"
+"Pork",2,2.85714285714286,2,"Domestic pig"
+"FriedChicken",1,1.42857142857143,1,NA
+"Chicken",1,1.42857142857143,1,"Chicken"
+"Pizza",1,1.42857142857143,1,NA
+"Eggs",4,5.71428571428571,5,"Eggs"
+"Darkbread",2,2.85714285714286,2,"Wheat bread"
+"Whitebread",2,2.85714285714286,2,"White bread"
+"WhiteRice",2,2.85714285714286,2,"Rice"
+"Sadza",1.66666666666667,2.38095238095238,2,"Corn"
+"Pearlenta",1.66666666666667,2.38095238095238,2,"Sorghum"
+"RollerMeal",1.66666666666667,2.38095238095238,2,"Millet"
+"MacaroniPastanosauce",3,4.28571428571429,4,"Pasta"
+"Maheu",1.5,2.14285714285714,2,"Beer"
+"TraditionalBeer",1.5,2.14285714285714,2,"Beer"
+"PeanutButter",3,4.28571428571429,4,"Peanut"
+"Sauces",3,4.28571428571429,4,NA
+"Dressing",3,4.28571428571429,4,NA
+"Biscuits",1,1.42857142857143,1,NA
