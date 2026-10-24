@@ -4,11 +4,11 @@ These are all files references in the scripts associated with the Inflammatory B
 
 ## General files 
 
-These files were all taken from the publicly available [site](https://ibdmdb.org/) associated with this study. They cant be upload to Github because of file size constraints. 
+These files were all subset from the publicly available [site](https://ibdmdb.org/) associated with this study. 
 
-- `ecs_3_metaG.tsv`: Microbiome metagenome 
-- `ecs_3_metaT.tsv`: Microbiome metatranscriptome 
-- `hmp2_metadata_2018-08-20.csv`: Cohort metadata 
+- `sub_metaG.tsv`: Microbiome metagenome, subset to relevant participants 
+- `sub_metaT.tsv`: Microbiome metatranscriptome, subset to relevant participants
+- `metadata.csv`: Cohort metadata, subset to only relevant participants 
 - `host_tx_counts.tsv`: human transcriptomes 
 
 ## Per participant files 
