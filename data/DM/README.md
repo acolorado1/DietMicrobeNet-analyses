@@ -8,7 +8,7 @@ These are all files references in the scripts associated with the Diet Modificat
 - `DM_KOs_shotgun.tsv`: Microbiome metagenome
 - `host_gene_counts_tmp.csv`: Host transcriptome
 - `agrarian_foodb.xlsx`: Publication has sample agrarian meals, this contains foodb equivalents 
-- `western_fb.xlsx`: Publication has sample western meals, this contains foodb equivalents 
+- `western_foodb.xlsx`: Publication has sample western meals, this contains foodb equivalents 
 - `metadata.xlsx`: Cohort metadata
 
 ## Per participant files 
