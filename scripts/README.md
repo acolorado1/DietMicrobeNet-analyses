@@ -72,12 +72,6 @@ DM[H]N is run from the DietMicrobeNet repository on each participant folder.
 
 `scripts/preprocessing/01_run_dmhn_benchmark.sh` runs every IBD pair folder through `run_workflow_benchmark.py`, which records runtime and peak memory in `data/benchmarking/benchmark_IBD.csv`. Set `DMN_DIR` at the top to your DietMicrobeNet repository and run it from the DietMicrobeNet run-workflow directory.
 
-| Study | DM[H]N output folders used |
-|---|---|
-| ZIM | `output_dm` (FFQ), `output_dm_ALL` (all foods), `output_dmh_ALL` (benchmark) |
-| DM | `output_dmh` (all foods), `output_dmh_ffq` (benchmark) |
-| IBD | `output_dmh` |
-
 ### 3. Collapse outputs: `scripts/preprocessing/02_collapse_outputs.R`
 
 DM[H]N writes many large files per participant; the analyses only need `graph/graph_results.csv`, plus `graph/network_summary.txt` for benchmarking. This script:
@@ -139,9 +133,3 @@ KEGG compound names are downloaded once and cached in `data/cache/kegg_compound_
 | Reaction composition | `build_reaction_matrix`, `reaction_composition_test`, `plot_reaction_pcoa`, `simper_robustness` |
 | Marker models | `label_zim_experiment`, `fit_lm_by_marker`, `cor_by_level`, `fit_marker_models` |
 | Benchmarking | `fit_diversity_pair`, `source_boxplot` |
-
-## Data sources
-
-- **ZIM**: Burkhart Colorado et al. (2026), *Microbiome*, [doi:10.1186/s40168-026-02410-z](https://link.springer.com/article/10.1186/s40168-026-02410-z). Shotgun metagenomes processed with [HoMi](https://github.com/sterrettJD/HoMi) / [HUMAnN 3](https://huttenhower.sph.harvard.edu/humann/).
-- **DM**: Diet Modification cohort; shotgun metagenomes processed with HUMAnN.
-- **IBD**: [Inflammatory Bowel Disease Multi'omics Database](https://ibdmdb.org/) (`ecs_3.tsv.gz` metagenomes and metatranscriptomes, `hmp2_metadata_2018-08-20.csv`, host transcriptome counts), subset to the selected participants.
