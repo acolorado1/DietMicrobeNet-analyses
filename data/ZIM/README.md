@@ -1,6 +1,6 @@
 # Zimbabwe Cohort Files 
 
-Thes are all files references in the scripts associated with the Zimbabwe cohort anaysis, from data gathering/formatting, to `DM[H]N` usage, and following analyses. 
+These are all files references in the scripts associated with the Zimbabwe cohort anaysis, from data gathering/formatting, to `DM[H]N` usage, and following analyses. 
 
 ## General files 
 
