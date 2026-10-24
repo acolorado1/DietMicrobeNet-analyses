@@ -8,7 +8,7 @@
 # Writes into data/<study>/participants/, overwriting the files there.
 # =============================================================================
 
-source(here::here("R", "functions.R"))
+source(here::here("scripts", "R", "functions.R"))
 suppressPackageStartupMessages(library(readxl))
 setwd(here::here())
 set.seed(5)

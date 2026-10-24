@@ -6,16 +6,19 @@
 #   2. Build the benchmarking table (needs network_summary.txt from the outputs)
 # =============================================================================
 
-source(here::here("R", "functions.R"))
+source(here::here("scripts", "R", "functions.R"))
 setwd(here::here())
 
-# ---- where DM[H]N was run (outside the repo): edit for your machine --------
+# ---- where DM[H]N was run: edit for your machine ---------------------------
 zim_dir   <- "~/Desktop/ZIM_dmn/participants"
 dm_dir    <- "~/Desktop/DM_dmn"
-ibd_dir   <- "~/Desktop/ibd_dmn"
-bench_dir <- "~/Desktop/benchmarking"     # holds the benchmark_*.csv files
+bench_dir <- "~/Desktop/benchmarking"     # holds the ZIM/DM benchmark_*.csv files
 
-include_ibd_in_benchmark <- FALSE
+# IBD is run inside the repo by 01_run_dmhn_benchmark.sh
+ibd_dir       <- "data/IBD"
+ibd_bench_csv <- "data/benchmarking/benchmark_IBD.csv"
+
+include_ibd <- FALSE   # IBD collapse + benchmark rows
 
 
 # =============================================================================
@@ -33,9 +36,11 @@ collapse_graph_results(file.path(dm_dir, "dm_ffq"),
                        "data/DM/graph_results_DM_ffq.csv.gz",
                        outputs = "output_dmh_ffq")
 
-collapse_graph_results(file.path(ibd_dir, "participants"),
-                       "data/IBD/graph_results_IBD.csv.gz",
-                       outputs = "output_dmh")
+if (include_ibd) {
+  collapse_graph_results(file.path(ibd_dir, "participants"),
+                         "data/IBD/graph_results_IBD.csv.gz",
+                         outputs = "output_dmh")
+}
 
 
 # =============================================================================
@@ -46,7 +51,7 @@ hpc_zim <- "/projects/aburkhartcolorado@xsede.org/DietMicrobeNet/zim"
 local_dm  <- path.expand(file.path(dm_dir, "participants"))
 local_zim <- path.expand(zim_dir)
 
-benchmark_IBD <- read_csv(file.path(bench_dir, "benchmark_IBD.csv"), show_col_types = FALSE) %>%
+benchmark_IBD <- if (include_ibd) read_csv(ibd_bench_csv, show_col_types = FALSE) %>%
   benchmark_paths(output_dir = "output_dmh") %>%
   mutate(experiment_type     = basename(directory_clean),
          participant_id      = basename(dirname(directory_clean)),
@@ -89,7 +94,7 @@ benchmark_ZIMdmh <- read_csv(file.path(bench_dir, "benchmark_ZIMdmh.csv"), show_
          host                = "yes")
 
 benchmark <- bind_rows(
-  if (include_ibd_in_benchmark) benchmark_IBD,
+  if (include_ibd) benchmark_IBD,
   benchmark_DMall, benchmark_DMffq, benchmark_ZIMdm, benchmark_ZIMdmh
 )
 

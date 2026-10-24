@@ -1,5 +1,5 @@
 ---
-title: "Case Study: Benchmarking"
+title: "Benchmarking"
 author: "Angela Sofia Burkhart Colorado"
 date: "`r Sys.Date()`"
 output:
@@ -35,7 +35,7 @@ library(lme4)
 library(lmerTest)
 library(performance)
 
-source(here::here("R", "functions.R"))
+source(here::here("scripts", "R", "functions.R"))
 dir.create("figures/benchmarking", recursive = TRUE, showWarnings = FALSE)
 options(scipen = 999)
 set.seed(5)

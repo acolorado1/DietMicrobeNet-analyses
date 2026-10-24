@@ -39,7 +39,7 @@ library(vegan)
 library(flextable)
 library(knitr)
 
-source(here::here("R", "functions.R"))
+source(here::here("scripts", "R", "functions.R"))
 dir.create("figures/ZIM", recursive = TRUE, showWarnings = FALSE)
 set.seed(5)
 ```

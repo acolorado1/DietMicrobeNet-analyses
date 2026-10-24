@@ -3,16 +3,19 @@
 # Run from the DietMicrobeNet run-workflow directory.
 set -euo pipefail
 
-IBD_DIR="/Users/burkhang/Desktop/ibd_dmn"
-DMN_DIR="/Users/burkhang/Code_Projs/DietMicrobeNet"
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"   # DietMicrobeNet-analyses
+DMN_DIR="/Users/burkhang/Code_Projs/DietMicrobeNet"                 # DietMicrobeNet repository
+IBD_DIR="${REPO_DIR}/data/IBD"
 
-python "${IBD_DIR}/run_workflow_benchmark.py" \
+mkdir -p "${REPO_DIR}/data/benchmarking"
+
+python "${REPO_DIR}/scripts/preprocessing/run_workflow_benchmark.py" \
     --directories "${IBD_DIR}"/participants/*/hg_mgx \
                   "${IBD_DIR}"/participants/*/hg_mtx \
                   "${IBD_DIR}"/participants/*/htx_mgx \
                   "${IBD_DIR}"/participants/*/htx_mtx \
     --script "${DMN_DIR}/run_workflow.py" \
-    --output "${IBD_DIR}/benchmark_results.csv" \
+    --output "${REPO_DIR}/data/benchmarking/benchmark_IBD.csv" \
     --extra-args \
         --dietmicrobehost \
         --e-weights \

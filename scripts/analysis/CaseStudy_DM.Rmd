@@ -37,7 +37,7 @@ library(scales)
 library(ggpubr)
 library(gt)
 
-source(here::here("R", "functions.R"))
+source(here::here("scripts", "R", "functions.R"))
 dir.create("figures/DM", recursive = TRUE, showWarnings = FALSE)
 ```
 

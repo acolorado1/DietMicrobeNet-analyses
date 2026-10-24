@@ -1,7 +1,7 @@
 # =============================================================================
 # Shared functions for the DM[H]N case studies (ZIM, DM, IBD, benchmarking)
 #
-#   source(here::here("R", "functions.R"))
+#   source(here::here("scripts", "R", "functions.R"))
 #
 # Sections
 #   1. Input preparation (before DM[H]N)
