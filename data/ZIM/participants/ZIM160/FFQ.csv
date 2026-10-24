@@ -1,0 +1,37 @@
+"food","score","raw_perc","perc","FooDB"
+"Avocado",1.5,2,2,"Avocado"
+"Plum",1.5,2,2,"European plum"
+"Bakedbeans",1,1.33333333333333,1,"Common bean"
+"Cannedmushrooms",1,1.33333333333333,1,"Common mushroom"
+"GreenVegetables",1,1.33333333333333,1,NA
+"Fries",1.33333333333333,1.77777777777778,1,"Potato"
+"Friedpotatoes",1.33333333333333,1.77777777777778,1,"Potato"
+"Roastedpotatoes",1.33333333333333,1.77777777777778,1,"Potato"
+"Sugarbeans",1.33333333333333,1.77777777777778,1,NA
+"Nyemba",1.33333333333333,1.77777777777778,1,"Cowpea"
+"Peas",1.33333333333333,1.77777777777778,1,"Common pea"
+"Beef",2,2.66666666666667,2,"Cattle (Beef, Veal)"
+"Pork",2,2.66666666666667,2,"Domestic pig"
+"PeriPeriChicken",1.5,2,2,NA
+"Nandos",1.5,2,2,NA
+"Eggs",4,5.33333333333333,5,"Eggs"
+"MatembaFish",1,1.33333333333333,1,"Clupeinae (Herring, Sardine, Sprat)"
+"Cannedtuna",1,1.33333333333333,1,"Scombridae (Bonito, Mackerel, Tuna)"
+"Darkbread",1.5,2,2,"Wheat bread"
+"Whitebread",1.5,2,2,"White bread"
+"WhiteRice",1,1.33333333333333,1,"Rice"
+"SadzaRapoko",1,1.33333333333333,1,"Corn"
+"ZviyoMhunga",1,1.33333333333333,1,"Sorghum"
+"MapfundeMugaiwa",1,1.33333333333333,1,"Millet"
+"Sadza",1.66666666666667,2.22222222222222,2,"Corn"
+"Pearlenta",1.66666666666667,2.22222222222222,2,"Sorghum"
+"RollerMeal",1.66666666666667,2.22222222222222,2,"Millet"
+"MacaroniPastanosauce",2,2.66666666666667,2,"Pasta"
+"Cascade",1,1.33333333333333,1,NA
+"SoftDrinks",1,1.33333333333333,1,NA
+"Juice",1,1.33333333333333,1,NA
+"Maheu",1.5,2,2,"Beer"
+"TraditionalBeer",1.5,2,2,"Beer"
+"PeanutButter",4,5.33333333333333,5,"Peanut"
+"Sauces",1.5,2,2,NA
+"Dressing",1.5,2,2,NA
