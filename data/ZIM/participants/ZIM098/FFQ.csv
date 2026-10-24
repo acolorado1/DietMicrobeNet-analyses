@@ -1,0 +1,21 @@
+"food","score","raw_perc","perc","FooDB"
+"Avocado",2.5,3.04878048780488,3,"Avocado"
+"Plum",2.5,3.04878048780488,3,"European plum"
+"Beef",2.5,3.04878048780488,3,"Cattle (Beef, Veal)"
+"Pork",2.5,3.04878048780488,3,"Domestic pig"
+"Eggs",3,3.65853658536585,3,"Eggs"
+"Darkbread",2.5,3.04878048780488,3,"Wheat bread"
+"Whitebread",2.5,3.04878048780488,3,"White bread"
+"WhiteRice",2,2.4390243902439,2,"Rice"
+"Samp",1,1.21951219512195,1,"Corn"
+"SadzaRapoko",1.66666666666667,2.03252032520325,2,"Corn"
+"ZviyoMhunga",1.66666666666667,2.03252032520325,2,"Sorghum"
+"MapfundeMugaiwa",1.66666666666667,2.03252032520325,2,"Millet"
+"MacaroniPastanosauce",4,4.87804878048781,4,"Pasta"
+"Cascade",1.66666666666667,2.03252032520325,2,NA
+"SoftDrinks",1.66666666666667,2.03252032520325,2,NA
+"Juice",1.66666666666667,2.03252032520325,2,NA
+"PeanutButter",5,6.09756097560976,6,"Peanut"
+"Cake",2.5,3.04878048780488,3,NA
+"Sweets",2.5,3.04878048780488,3,NA
+"Biscuits",5,6.09756097560976,6,NA

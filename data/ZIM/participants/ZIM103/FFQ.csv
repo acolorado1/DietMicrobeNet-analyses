@@ -1,0 +1,33 @@
+"food","score","raw_perc","perc","FooDB"
+"Butter",1.5,2.11267605633803,2,"Butter"
+"Margarine",1.5,2.11267605633803,2,"Margarine"
+"Avocado",1,1.40845070422535,1,"Avocado"
+"Plum",1,1.40845070422535,1,"European plum"
+"Beef",1.5,2.11267605633803,2,"Cattle (Beef, Veal)"
+"Pork",1.5,2.11267605633803,2,"Domestic pig"
+"FriedChicken",1.5,2.11267605633803,2,NA
+"Chicken",1.5,2.11267605633803,2,"Chicken"
+"Hamburger",1,1.40845070422535,1,NA
+"PeriPeriChicken",1,1.40845070422535,1,NA
+"Nandos",1,1.40845070422535,1,NA
+"Eggs",4,5.63380281690141,5,"Eggs"
+"MatembaFish",1,1.40845070422535,1,"Clupeinae (Herring, Sardine, Sprat)"
+"Cannedtuna",1,1.40845070422535,1,"Scombridae (Bonito, Mackerel, Tuna)"
+"Darkbread",2.5,3.52112676056338,3,"Wheat bread"
+"Whitebread",2.5,3.52112676056338,3,"White bread"
+"WhiteRice",2,2.81690140845071,2,"Rice"
+"Samp",1,1.40845070422535,1,"Corn"
+"SadzaRapoko",1.66666666666667,2.34741784037559,2,"Corn"
+"ZviyoMhunga",1.66666666666667,2.34741784037559,2,"Sorghum"
+"MapfundeMugaiwa",1.66666666666667,2.34741784037559,2,"Millet"
+"Cascade",1,1.40845070422535,1,NA
+"SoftDrinks",1,1.40845070422535,1,NA
+"Juice",1,1.40845070422535,1,NA
+"Maheu",1.5,2.11267605633803,2,"Beer"
+"TraditionalBeer",1.5,2.11267605633803,2,"Beer"
+"PeanutButter",3,4.22535211267606,4,"Peanut"
+"Sauces",1.5,2.11267605633803,2,NA
+"Dressing",1.5,2.11267605633803,2,NA
+"Cake",1,1.40845070422535,1,NA
+"Sweets",1,1.40845070422535,1,NA
+"Biscuits",2,2.81690140845071,2,NA

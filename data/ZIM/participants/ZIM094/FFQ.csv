@@ -1,0 +1,28 @@
+"food","score","raw_perc","perc","FooDB"
+"Grapes",0.6,1.03448275862069,1,"Common grape"
+"Banana",0.6,1.03448275862069,1,"Banana"
+"Apple",0.6,1.03448275862069,1,"Apple"
+"Peaches",0.6,1.03448275862069,1,"Peach"
+"SugarCane",0.6,1.03448275862069,1,"Sugar"
+"Sugarbeans",0.666666666666667,1.14942528735632,1,NA
+"Nyemba",0.666666666666667,1.14942528735632,1,"Cowpea"
+"Peas",0.666666666666667,1.14942528735632,1,"Common pea"
+"Beef",1.5,2.58620689655172,2,"Cattle (Beef, Veal)"
+"Pork",1.5,2.58620689655172,2,"Domestic pig"
+"FriedChicken",1,1.72413793103448,1,NA
+"Chicken",1,1.72413793103448,1,"Chicken"
+"Eggs",3,5.17241379310345,5,"Eggs"
+"Darkbread",2,3.44827586206897,3,"Wheat bread"
+"Whitebread",2,3.44827586206897,3,"White bread"
+"WhiteRice",4,6.89655172413793,6,"Rice"
+"SadzaRapoko",1.66666666666667,2.8735632183908,2,"Corn"
+"ZviyoMhunga",1.66666666666667,2.8735632183908,2,"Sorghum"
+"MapfundeMugaiwa",1.66666666666667,2.8735632183908,2,"Millet"
+"MacaroniPastanosauce",3,5.17241379310345,5,"Pasta"
+"Cascade",0.666666666666667,1.14942528735632,1,NA
+"SoftDrinks",0.666666666666667,1.14942528735632,1,NA
+"Juice",0.666666666666667,1.14942528735632,1,NA
+"Maheu",1.5,2.58620689655172,2,"Beer"
+"TraditionalBeer",1.5,2.58620689655172,2,"Beer"
+"PeanutButter",4,6.89655172413793,6,"Peanut"
+"Biscuits",1,1.72413793103448,1,NA
