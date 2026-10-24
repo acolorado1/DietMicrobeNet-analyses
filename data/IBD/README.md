@@ -1,4 +1,4 @@
-# Diet Modification Cohort Files 
+# Inflammatory Bowel Disease Cohort Files 
 
 These are all files references in the scripts associated with the Inflammatory Bowel Disease cohort anaysis, from data gathering/formatting, to `DM[H]N` usage, and following analyses. 
 
