@@ -1,0 +1,35 @@
+"food","score","raw_perc","perc","FooDB"
+"Butter",1,1.31578947368421,1,"Butter"
+"Margarine",1,1.31578947368421,1,"Margarine"
+"Fries",1,1.31578947368421,1,"Potato"
+"Friedpotatoes",1,1.31578947368421,1,"Potato"
+"Roastedpotatoes",1,1.31578947368421,1,"Potato"
+"Sugarbeans",1,1.31578947368421,1,NA
+"Nyemba",1,1.31578947368421,1,"Cowpea"
+"Peas",1,1.31578947368421,1,"Common pea"
+"Beef",1.5,1.97368421052632,1,"Cattle (Beef, Veal)"
+"Pork",1.5,1.97368421052632,1,"Domestic pig"
+"Hamburger",1,1.31578947368421,1,NA
+"Pizza",1,1.31578947368421,1,NA
+"Eggs",2,2.63157894736842,2,"Eggs"
+"Caterpillar",1,1.31578947368421,1,NA
+"Locust",1,1.31578947368421,1,NA
+"Termites",1,1.31578947368421,1,NA
+"Darkbread",2,2.63157894736842,2,"Wheat bread"
+"Whitebread",2,2.63157894736842,2,"White bread"
+"WhiteRice",4,5.26315789473684,5,"Rice"
+"SadzaRapoko",1.33333333333333,1.75438596491228,1,"Corn"
+"ZviyoMhunga",1.33333333333333,1.75438596491228,1,"Sorghum"
+"MapfundeMugaiwa",1.33333333333333,1.75438596491228,1,"Millet"
+"MacaroniPastanosauce",3,3.94736842105263,3,"Pasta"
+"Cascade",1,1.31578947368421,1,NA
+"SoftDrinks",1,1.31578947368421,1,NA
+"Juice",1,1.31578947368421,1,NA
+"Maheu",1,1.31578947368421,1,"Beer"
+"TraditionalBeer",1,1.31578947368421,1,"Beer"
+"PeanutButter",3,3.94736842105263,3,"Peanut"
+"Sauces",3,3.94736842105263,3,NA
+"Dressing",3,3.94736842105263,3,NA
+"Cake",1.5,1.97368421052632,1,NA
+"Sweets",1.5,1.97368421052632,1,NA
+"Biscuits",3,3.94736842105263,3,NA

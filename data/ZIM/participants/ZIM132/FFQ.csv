@@ -1,0 +1,43 @@
+"food","score","raw_perc","perc","FooDB"
+"Butter",0.5,1.08695652173913,1,"Butter"
+"Margarine",0.5,1.08695652173913,1,"Margarine"
+"Grapes",0.6,1.30434782608696,1,"Common grape"
+"Banana",0.6,1.30434782608696,1,"Banana"
+"Apple",0.6,1.30434782608696,1,"Apple"
+"Peaches",0.6,1.30434782608696,1,"Peach"
+"SugarCane",0.6,1.30434782608696,1,"Sugar"
+"Mango",0.5,1.08695652173913,1,"Mango"
+"Naartjie",0.5,1.08695652173913,1,"Mandarin orange (Clementine, Tangerine)"
+"Orange",0.5,1.08695652173913,1,"Sweet orange"
+"Pineapple",0.5,1.08695652173913,1,"Pineapple"
+"PawPaw",0.5,1.08695652173913,1,NA
+"Guava",0.5,1.08695652173913,1,"Guava"
+"Nyii",0.5,1.08695652173913,1,"Date"
+"Maonde",0.5,1.08695652173913,1,"Fig"
+"Mazhanje",0.5,1.08695652173913,1,"Loquat"
+"Lemon",0.5,1.08695652173913,1,"Lemon"
+"Boabab",0.5,1.08695652173913,1,NA
+"Tsubvu",0.5,1.08695652173913,1,NA
+"Mathowe",0.5,1.08695652173913,1,NA
+"Masau",0.5,1.08695652173913,1,NA
+"Avocado",2,4.34782608695652,4,"Avocado"
+"Plum",2,4.34782608695652,4,"European plum"
+"Sugarbeans",0.666666666666667,1.44927536231884,1,NA
+"Nyemba",0.666666666666667,1.44927536231884,1,"Cowpea"
+"Peas",0.666666666666667,1.44927536231884,1,"Common pea"
+"Beef",0.5,1.08695652173913,1,"Cattle (Beef, Veal)"
+"Pork",0.5,1.08695652173913,1,"Domestic pig"
+"Eggs",2,4.34782608695652,4,"Eggs"
+"MatembaFish",0.5,1.08695652173913,1,"Clupeinae (Herring, Sardine, Sprat)"
+"Cannedtuna",0.5,1.08695652173913,1,"Scombridae (Bonito, Mackerel, Tuna)"
+"Darkbread",0.5,1.08695652173913,1,"Wheat bread"
+"Whitebread",0.5,1.08695652173913,1,"White bread"
+"WhiteRice",2,4.34782608695652,4,"Rice"
+"SadzaRapoko",1.66666666666667,3.6231884057971,3,"Corn"
+"ZviyoMhunga",1.66666666666667,3.6231884057971,3,"Sorghum"
+"MapfundeMugaiwa",1.66666666666667,3.6231884057971,3,"Millet"
+"Maheu",0.5,1.08695652173913,1,"Beer"
+"TraditionalBeer",0.5,1.08695652173913,1,"Beer"
+"PeanutButter",1,2.17391304347826,2,"Peanut"
+"Sauces",2.5,5.43478260869565,5,NA
+"Dressing",2.5,5.43478260869565,5,NA

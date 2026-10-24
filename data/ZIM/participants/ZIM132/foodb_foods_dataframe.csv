@@ -1,0 +1,34 @@
+"id","name","name_scientific","food_frequency"
+12,"Pineapple","Ananas comosus",1
+16,"Peanut","Arachis hypogaea",2
+54,"Lemon","Citrus limon",1
+56,"Mandarin orange (Clementine, Tangerine)","Citrus reticulata",1
+57,"Sweet orange","Citrus sinensis",1
+76,"Loquat","Eriobotrya japonica",1
+81,"Fig","Ficus carica",1
+105,"Apple","Malus pumila",1
+106,"Mango","Mangifera indica",1
+125,"Rice","Oryza sativa",4
+126,"Millet","Panicum miliaceum",3
+130,"Avocado","Persea americana",4
+135,"Date","Phoenix dactylifera",1
+141,"Common pea","Pisum sativum",1
+147,"European plum","Prunus domestica",4
+149,"Peach","Prunus persica",1
+150,"Guava","Psidium guajava",1
+177,"Sorghum","Sorghum bicolor",3
+202,"Cowpea","Vigna unguiculata",1
+204,"Common grape","Vitis vinifera",1
+205,"Corn","Zea mays",3
+208,"Banana","Musa acuminata",1
+268,"Beer",NA,2
+506,"Cattle (Beef, Veal)","Bos taurus",1
+531,"Clupeinae (Herring, Sardine, Sprat)","Clupeinae",1
+549,"Domestic pig","Sus scrofa domestica",1
+600,"Scombridae (Bonito, Mackerel, Tuna)","Scombridae",1
+633,"Eggs",NA,4
+667,"Butter",NA,1
+670,"Sugar",NA,1
+836,"Wheat bread",NA,1
+872,"Margarine",NA,1
+1019,"White bread",NA,1
