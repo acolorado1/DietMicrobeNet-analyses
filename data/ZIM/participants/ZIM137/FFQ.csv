@@ -1,0 +1,23 @@
+"food","score","raw_perc","perc","FooDB"
+"Grapes",0.6,1.13207547169811,1,"Common grape"
+"Banana",0.6,1.13207547169811,1,"Banana"
+"Apple",0.6,1.13207547169811,1,"Apple"
+"Peaches",0.6,1.13207547169811,1,"Peach"
+"SugarCane",0.6,1.13207547169811,1,"Sugar"
+"Avocado",1,1.88679245283019,1,"Avocado"
+"Plum",1,1.88679245283019,1,"European plum"
+"Fries",0.666666666666667,1.25786163522013,1,"Potato"
+"Friedpotatoes",0.666666666666667,1.25786163522013,1,"Potato"
+"Roastedpotatoes",0.666666666666667,1.25786163522013,1,"Potato"
+"Eggs",2,3.77358490566038,3,"Eggs"
+"Darkbread",1,1.88679245283019,1,"Wheat bread"
+"Whitebread",1,1.88679245283019,1,"White bread"
+"WhiteRice",3,5.66037735849057,5,"Rice"
+"SadzaRapoko",1.66666666666667,3.14465408805032,3,"Corn"
+"ZviyoMhunga",1.66666666666667,3.14465408805032,3,"Sorghum"
+"MapfundeMugaiwa",1.66666666666667,3.14465408805032,3,"Millet"
+"MacaroniPastanosauce",1,1.88679245283019,1,"Pasta"
+"PeanutButter",2,3.77358490566038,3,"Peanut"
+"Sauces",2.5,4.71698113207547,4,NA
+"Dressing",2.5,4.71698113207547,4,NA
+"Biscuits",1,1.88679245283019,1,NA

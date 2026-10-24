@@ -1,0 +1,20 @@
+"id","name","name_scientific","food_frequency"
+16,"Peanut","Arachis hypogaea",1
+105,"Apple","Malus pumila",1
+125,"Rice","Oryza sativa",3
+126,"Millet","Panicum miliaceum",2
+130,"Avocado","Persea americana",2
+147,"European plum","Prunus domestica",2
+149,"Peach","Prunus persica",1
+175,"Potato","Solanum tuberosum",3
+177,"Sorghum","Sorghum bicolor",2
+204,"Common grape","Vitis vinifera",1
+205,"Corn","Zea mays",2
+208,"Banana","Musa acuminata",1
+268,"Beer",NA,6
+274,"Pasta",NA,1
+334,"Chicken","Gallus gallus",2
+506,"Cattle (Beef, Veal)","Bos taurus",1
+549,"Domestic pig","Sus scrofa domestica",1
+633,"Eggs",NA,1
+670,"Sugar",NA,1
