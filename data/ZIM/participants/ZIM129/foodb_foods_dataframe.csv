@@ -1,0 +1,40 @@
+"id","name","name_scientific","food_frequency"
+12,"Pineapple","Ananas comosus",1
+16,"Peanut","Arachis hypogaea",6
+27,"Chinese mustard","Brassica juncea",1
+29,"Rape","Brassica napus var. napus",1
+30,"Common cabbage","Brassica oleracea",1
+54,"Lemon","Citrus limon",1
+56,"Mandarin orange (Clementine, Tangerine)","Citrus reticulata",1
+57,"Sweet orange","Citrus sinensis",1
+65,"Cucumber","Cucumis sativus",1
+76,"Loquat","Eriobotrya japonica",1
+81,"Fig","Ficus carica",1
+106,"Mango","Mangifera indica",1
+125,"Rice","Oryza sativa",2
+126,"Millet","Panicum miliaceum",4
+130,"Avocado","Persea americana",1
+135,"Date","Phoenix dactylifera",1
+147,"European plum","Prunus domestica",1
+150,"Guava","Psidium guajava",1
+177,"Sorghum","Sorghum bicolor",4
+205,"Corn","Zea mays",6
+215,"Celery stalks","Apium graveolens var. dulce",1
+245,"Carrot","Daucus carota ssp. sativus",1
+268,"Beer",NA,2
+274,"Pasta",NA,4
+334,"Chicken","Gallus gallus",1
+373,"Greylag goose","Anser anser",1
+395,"Kale","Brassica napus var. pabularia",2
+421,"Mustard spinach","Brassica perviridis",NA
+506,"Cattle (Beef, Veal)","Bos taurus",1
+531,"Clupeinae (Herring, Sardine, Sprat)","Clupeinae",1
+540,"Rabbit","Leporidae",1
+549,"Domestic pig","Sus scrofa domestica",1
+561,"Common mushroom","Agaricus bisporus",1
+600,"Scombridae (Bonito, Mackerel, Tuna)","Scombridae",1
+633,"Eggs",NA,2
+667,"Butter",NA,1
+836,"Wheat bread",NA,1
+872,"Margarine",NA,1
+1019,"White bread",NA,1

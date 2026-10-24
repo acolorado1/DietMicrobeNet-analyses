@@ -1,0 +1,59 @@
+"food","score","raw_perc","perc","FooDB"
+"Butter",0.5,1.11111111111111,1,"Butter"
+"Margarine",0.5,1.11111111111111,1,"Margarine"
+"Mango",0.5,1.11111111111111,1,"Mango"
+"Naartjie",0.5,1.11111111111111,1,"Mandarin orange (Clementine, Tangerine)"
+"Orange",0.5,1.11111111111111,1,"Sweet orange"
+"Pineapple",0.5,1.11111111111111,1,"Pineapple"
+"PawPaw",0.5,1.11111111111111,1,NA
+"Guava",0.5,1.11111111111111,1,"Guava"
+"Nyii",0.5,1.11111111111111,1,"Date"
+"Maonde",0.5,1.11111111111111,1,"Fig"
+"Mazhanje",0.5,1.11111111111111,1,"Loquat"
+"Lemon",0.5,1.11111111111111,1,"Lemon"
+"Boabab",0.5,1.11111111111111,1,NA
+"Tsubvu",0.5,1.11111111111111,1,NA
+"Mathowe",0.5,1.11111111111111,1,NA
+"Masau",0.5,1.11111111111111,1,NA
+"Avocado",0.5,1.11111111111111,1,"Avocado"
+"Plum",0.5,1.11111111111111,1,"European plum"
+"Muboora",0.454545454545455,1.01010101010101,1,NA
+"Nyevhe",0.454545454545455,1.01010101010101,1,NA
+"Rape",0.454545454545455,1.01010101010101,1,"Rape"
+"Rugare",0.454545454545455,1.01010101010101,1,"Kale"
+"Kovo",0.454545454545455,1.01010101010101,1,"Kale"
+"Mowa",0.454545454545455,1.01010101010101,1,"Chinese mustard"
+"Tsunga",0.454545454545455,1.01010101010101,1,"Mustard Spinach"
+"Cabbage",0.454545454545455,1.01010101010101,1,"Common cabbage"
+"Carrots",0.454545454545455,1.01010101010101,1,"Carrot"
+"Celery",0.454545454545455,1.01010101010101,1,"Celery stalks"
+"Celery",0.454545454545455,1.01010101010101,1,"Common mushroom"
+"Cucumber",0.454545454545455,1.01010101010101,1,"Cucumber"
+"Beef",0.5,1.11111111111111,1,"Cattle (Beef, Veal)"
+"Pork",0.5,1.11111111111111,1,"Domestic pig"
+"Chicken",0.5,1.11111111111111,1,"Chicken"
+"Birds",0.5,1.11111111111111,1,"Greylag goose"
+"Rabbit",0.5,1.11111111111111,1,"Rabbit"
+"Mbeva",0.5,1.11111111111111,1,NA
+"without",0.5,1.11111111111111,1,NA
+"skin",0.5,1.11111111111111,1,NA
+"Eggs",1,2.22222222222222,2,"Eggs"
+"MatembaFish",0.5,1.11111111111111,1,"Clupeinae (Herring, Sardine, Sprat)"
+"Cannedtuna",0.5,1.11111111111111,1,"Scombridae (Bonito, Mackerel, Tuna)"
+"Darkbread",0.5,1.11111111111111,1,"Wheat bread"
+"Whitebread",0.5,1.11111111111111,1,"White bread"
+"WhiteRice",1,2.22222222222222,2,"Rice"
+"Samp",1,2.22222222222222,2,"Corn"
+"SadzaRapoko",2,4.44444444444444,4,"Corn"
+"ZviyoMhunga",2,4.44444444444444,4,"Sorghum"
+"MapfundeMugaiwa",2,4.44444444444444,4,"Millet"
+"MacaroniPastanosauce",2,4.44444444444444,4,"Pasta"
+"Cascade",0.666666666666667,1.48148148148148,1,NA
+"SoftDrinks",0.666666666666667,1.48148148148148,1,NA
+"Juice",0.666666666666667,1.48148148148148,1,NA
+"Maheu",0.5,1.11111111111111,1,"Beer"
+"TraditionalBeer",0.5,1.11111111111111,1,"Beer"
+"PeanutButter",3,6.66666666666667,6,"Peanut"
+"Sauces",1,2.22222222222222,2,NA
+"Dressing",1,2.22222222222222,2,NA
+"Biscuits",1,2.22222222222222,2,NA
