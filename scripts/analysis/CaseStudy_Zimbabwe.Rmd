@@ -1,0 +1,845 @@
+---
+title: "Case Study: Zimbabwe Cohort"
+author: "Angela Sofia Burkhart Colorado"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 5
+---
+
+```{css, echo = F}
+h1, h4 {
+  text-align: center;
+  color: #007791;
+}
+h2, h3 {
+  color: cadetblue;
+}
+```
+
+```{r setup, include = FALSE}
+# ---- path to the DietMicrobeNet HMDB table ----
+hmdb_path <- "~/Code_Projs/DietMicrobeNet/Data/hmdb.csv"
+
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, fig.align = "center")
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+## Packages
+
+```{r packages}
+library(tidyverse)
+library(cowplot)
+library(ggpubr)
+library(Polychrome)
+library(scales)
+library(vegan)
+library(flextable)
+library(knitr)
+
+source(here::here("R", "functions.R"))
+dir.create("figures/ZIM", recursive = TRUE, showWarnings = FALSE)
+set.seed(5)
+```
+
+## Data
+
+```{r data}
+metadata <- read_delim("data/ZIM/zim2_baseline.txt", delim = "\t",
+                       escape_double = FALSE, trim_ws = TRUE)
+hmdb       <- read_hmdb(hmdb_path)
+kegg_names <- kegg_compound_names("data/cache/kegg_compound_names.rds")
+
+sampleids <- c(
+  "ZIM089", "ZIM098", "ZIM106", "ZIM116", "ZIM125", "ZIM130", "ZIM139", "ZIM153", "ZIM160",
+  "ZIM091", "ZIM100", "ZIM110", "ZIM117", "ZIM126", "ZIM132", "ZIM143", "ZIM155", "ZIM161",
+  "ZIM094", "ZIM103", "ZIM111", "ZIM120", "ZIM127", "ZIM137", "ZIM146", "ZIM158", "ZIM162",
+  "ZIM095", "ZIM105", "ZIM113", "ZIM123", "ZIM129", "ZIM138", "ZIM147", "ZIM159", "ZIM166"
+)
+setdiff(sampleids, metadata$PID)
+
+zim_outputs <- c(output_dm     = "DietMicrobe_FFQ",
+                 output_dm_ALL = "DietMicrobe_AllFoods")
+
+subset_meta <- metadata %>%
+  filter(Visit == 2, PID %in% sampleids) %>%
+  mutate(diet = ifelse(WA_Difference > 0, "w", "a")) %>%
+  select(PID, cohort = Cohort_Short, gender = Gender, diet) %>%
+  na.omit()
+
+results <- read_collapsed_results("data/ZIM/graph_results_ZIM.csv.gz") %>%
+  filter(output %in% names(zim_outputs)) %>%
+  mutate(PID = run_dir, experiment = unname(zim_outputs[output])) %>%
+  select(-run_dir, -output) %>%
+  inner_join(subset_meta, by = "PID") %>%
+  mutate(
+    pattern_type = case_when(
+      compound1_origin == "food" & compound2_origin == "microbe" ~ "most",
+      TRUE ~ "least"
+    ),
+    diet   = case_when(diet == "a" ~ "Agrarian",
+                       diet == "w" ~ "Western"),
+    cohort = case_when(cohort == "A" ~ "Naïve",
+                       cohort == "B" ~ "Exp",
+                       cohort == "C" ~ "HC"),
+    cohort = factor(cohort, levels = c("Naïve", "Exp", "HC"))
+  )
+head(results)
+```
+
+## Core method validation
+
+```{r tma search}
+# choline (C00114) -> TMA (C00565)
+results %>% filter(compound1_id == "C00114")
+
+humann_output <- read_tsv("data/ZIM/Zim_KOs.tsv")
+humann_output[startsWith(humann_output$Gene.Family, "K20038"), ]
+```
+
+```{r pheny search}
+# phenylalanine (C00079/C02265) -> 3-phenylpropanoate (C05629)
+results %>%
+  filter(compound1_id %in% c("C00079", "C02265"),
+         compound2_id == "C05629")
+```
+
+## Diet -> microbe reactions
+
+```{r reaction breadth}
+diet_microbe_hits <- results %>%
+  filter(experiment == "DietMicrobe_FFQ",
+         compound1_origin == "food", compound2_origin == "microbe")
+
+reaction_level <- diet_microbe_hits %>%
+  mutate(
+    KO_list       = str_extract_all(KOs, "K[0-9]{5}"),
+    n_KOs         = lengths(KO_list),
+    organism_list = str_split(str_remove_all(organisms, "^\\['|'\\]$"), ",\\s*"),
+    n_organisms   = lengths(organism_list)
+  ) %>%
+  distinct(reaction, compound1_id, compound2_id, .keep_all = TRUE) %>%
+  select(reaction, compound1_id, compound2_id, KO_list, organism_list, n_KOs, n_organisms)
+
+organism_reaction_map <- reaction_level %>%
+  select(reaction, compound1_id, compound2_id, organism_list) %>%
+  unnest(organism_list) %>%
+  rename(organism = organism_list) %>%
+  filter(organism != "unclassified")
+
+organism_summary <- organism_reaction_map %>%
+  group_by(organism) %>%
+  summarise(n_distinct_reactions = n_distinct(reaction),
+            n_distinct_pairs     = n_distinct(paste(compound1_id, compound2_id)),
+            .groups = "drop") %>%
+  arrange(desc(n_distinct_reactions))
+
+KO_summary <- reaction_level %>%
+  select(reaction, compound1_id, compound2_id, KO_list) %>%
+  unnest(KO_list) %>%
+  rename(KO = KO_list) %>%
+  group_by(KO) %>%
+  summarise(n_distinct_reactions = n_distinct(reaction),
+            n_distinct_pairs     = n_distinct(paste(compound1_id, compound2_id)),
+            .groups = "drop") %>%
+  arrange(desc(n_distinct_reactions))
+
+reaction_summary <- reaction_level %>%
+  select(reaction, compound1_id, compound2_id, n_KOs, n_organisms) %>%
+  arrange(desc(n_organisms))
+
+organism_KO_summary <- organism_reaction_map %>%
+  left_join(select(reaction_level, reaction, compound1_id, compound2_id, KO_list),
+            by = c("reaction", "compound1_id", "compound2_id")) %>%
+  unnest(KO_list) %>%
+  rename(KO = KO_list) %>%
+  group_by(organism) %>%
+  summarise(n_distinct_KOs       = n_distinct(KO),
+            n_distinct_reactions = n_distinct(reaction),
+            n_distinct_pairs     = n_distinct(paste(compound1_id, compound2_id)),
+            .groups = "drop") %>%
+  arrange(desc(n_distinct_pairs))
+
+org_summary_table <- head(organism_KO_summary, 20)
+colnames(org_summary_table) <- c("Organism", "Distinct\nKOs", "Distinct\nReactions", "Distinct\nPairs")
+save_as_image(width(flextable(org_summary_table) %>%
+                      line_spacing(space = 1.25, part = "header"),
+                    j = c("Distinct\nKOs", "Distinct\nReactions", "Distinct\nPairs"),
+                    width = 1.0),
+              path = "figures/ZIM/table_z_org_summary.png")
+```
+
+```{r top reactions}
+food_lookup <- diet_microbe_hits %>%
+  distinct(compound1_id, .keep_all = TRUE) %>%
+  select(compound1_id, compound1_assoc_food)
+
+reaction_level %>%
+  left_join(food_lookup, by = "compound1_id") %>%
+  arrange(desc(n_organisms)) %>%
+  select(reaction, compound1_id, compound1_assoc_food, compound2_id, n_KOs, n_organisms) %>%
+  head(15) %>%
+  kable()
+```
+
+## Reaction composition by diet (FFQ)
+
+```{r composition ffq}
+rm_ffq   <- build_reaction_matrix(diet_microbe_hits)
+comp_ffq <- reaction_composition_test(rm_ffq)
+
+comp_ffq$permanova
+comp_ffq$dispersion
+comp_ffq$pct_var
+comp_ffq$eig_check
+
+plot_reaction_pcoa(comp_ffq)
+```
+
+```{r simper ffq}
+simp_ffq <- simper_robustness(rm_ffq)
+simp_ffq$simper
+simp_ffq$permanova_reduced
+
+sig_reactions_ffq <- simp_ffq$sig_reactions
+```
+
+```{r sig reactions}
+reaction_labels <- c(
+  R02199 = "R02199: L-isoleucine:2-oxoglutarate aminotransferase",
+  R01090 = "R01090: L-leucine:2-oxoglutarate aminotransferase",
+  R01579 = "R01579: D-glutamine amidohydrolase",
+  R03163 = "R03163: L-fucose aldose-ketose-isomerase",
+  R01432 = "R01432: D-xylose aldose-ketose-isomerase",
+  R02437 = "R02437: L-rhamnose ketol-isomerase",
+  R13064 = "R13064: naringin rhamnohydrolase"
+)
+
+sig_long <- rm_ffq$wide %>%
+  select(PID, diet, all_of(sig_reactions_ffq)) %>%
+  pivot_longer(cols = all_of(sig_reactions_ffq), names_to = "reaction", values_to = "abundance") %>%
+  mutate(reaction_label = recode(reaction, !!!reaction_labels))
+
+A <- ggplot(sig_long, aes(x = diet, y = abundance)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.15, alpha = 0.3, size = 0.8) +
+  facet_wrap(~ reaction_label, scales = "free_y",
+             labeller = labeller(reaction_label = label_wrap_gen(20))) +
+  labs(x = NULL, y = "Abundance") +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+```{r compounds foods, fig.width=15, fig.height=10}
+patterns <- diet_microbe_hits %>%
+  filter(reaction %in% sig_reactions_ffq) %>%
+  distinct(PID, compound1_id, compound1_assoc_food, compound1_freq, diet, reaction) %>%
+  group_by(PID) %>%
+  mutate(pid_total_sig_freq = sum(compound1_freq[!duplicated(compound1_id)], na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(rel_freq = compound1_freq / pid_total_sig_freq,
+         food     = map(compound1_assoc_food, parse_py_list_safe)) %>%
+  unnest(food) %>%
+  select(-compound1_assoc_food) %>%
+  distinct() %>%
+  mutate(reaction_label = recode(reaction, !!!reaction_labels))
+
+kegg_lookup <- kegg_name_lookup(patterns$compound1_id, kegg_names, id_col = "compound1_id")
+
+food_summary <- patterns %>%
+  distinct(reaction_label, compound1_id, food) %>%
+  count(reaction_label, compound1_id, name = "n_foods") %>%
+  left_join(kegg_lookup, by = "compound1_id") %>%
+  mutate(c_label = paste0(compound1_id, ": ", name)) %>%
+  distinct()
+
+exposure_df <- patterns %>%
+  distinct(PID, diet, reaction_label, compound1_id, compound1_freq) %>%
+  left_join(kegg_lookup, by = "compound1_id") %>%
+  mutate(c_label = paste0(compound1_id, ": ", name))
+
+# number of associated foods per compound
+B <- ggplot(food_summary, aes(reorder(c_label, n_foods), n_foods)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = NULL, y = "Number of associated foods") +
+  theme_bw() +
+  scale_x_discrete(labels = label_wrap(width = 10))
+
+# compound intake frequency by diet
+C <- ggplot(exposure_df, aes(x = diet, y = compound1_freq)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.15, alpha = 0.3, size = 0.8) +
+  facet_wrap(~ c_label, scales = "free_y", labeller = labeller(c_label = label_wrap_gen(25))) +
+  stat_compare_means(method = "wilcox.test", label = "p.format",
+                     label.x = 1.5, label.y.npc = "top", vjust = 1, hide.ns = TRUE) +
+  coord_cartesian(clip = "off") +
+  theme_bw() +
+  labs(x = NULL, y = "Compound frequency")
+
+stats_df <- exposure_df %>%
+  group_by(reaction_label) %>%
+  summarise(p_value = wilcox.test(compound1_freq ~ diet)$p.value, .groups = "drop") %>%
+  mutate(p_adj = p.adjust(p_value, method = "BH"))
+stats_df
+
+# top 10 foods per compound and diet
+top_n_foods <- 10
+
+stack_data <- patterns %>%
+  distinct(PID, compound1_id, diet, food) %>%
+  count(compound1_id, diet, food, name = "n_pid") %>%
+  group_by(compound1_id, diet) %>%
+  mutate(rank     = rank(-n_pid, ties.method = "first"),
+         food_grp = if_else(rank <= top_n_foods, food, "Other")) %>%
+  group_by(compound1_id, diet, food_grp) %>%
+  summarise(n_pid = sum(n_pid), .groups = "drop") %>%
+  group_by(compound1_id, diet) %>%
+  mutate(prop = n_pid / sum(n_pid)) %>%
+  ungroup()
+
+food_levels <- stack_data %>%
+  filter(food_grp != "Other") %>%
+  group_by(food_grp) %>%
+  summarise(total_prop = sum(prop), .groups = "drop") %>%
+  arrange(desc(total_prop)) %>%
+  pull(food_grp)
+
+code_lookup <- tibble(food_grp = c(food_levels, "Other")) %>%
+  mutate(code = row_number())
+
+stack_data <- stack_data %>%
+  left_join(code_lookup, by = "food_grp") %>%
+  mutate(food_grp = factor(food_grp, levels = code_lookup$food_grp)) %>%
+  left_join(kegg_lookup, by = "compound1_id")
+
+set.seed(42)
+pal <- unname(createPalette(length(food_levels), c("#FF0000", "#00FF00", "#0000FF")))
+food_colors <- setNames(c(pal, "grey70"), code_lookup$food_grp)
+class_labels_numbered <- setNames(paste0(code_lookup$code, ": ", code_lookup$food_grp),
+                                  code_lookup$food_grp)
+
+top_foods <- ggplot(stack_data, aes(x = diet, y = prop, fill = food_grp)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = code), position = position_fill(vjust = 0.5),
+            size = 3, color = "grey4", fontface = "bold") +
+  scale_fill_manual(values = food_colors, labels = label_wrap(20)(class_labels_numbered)) +
+  coord_flip() +
+  facet_wrap(~ name, ncol = 1, scales = "free_y") +
+  theme_bw() +
+  theme(legend.position = "bottom", plot.title = element_text(hjust = 0.5),
+        plot.margin = ggplot2::margin(5.5, 5.5, 5.5, 5.5)) +
+  guides(fill = guide_legend(nrow = 2)) +
+  labs(x = NULL, y = "Proportion", fill = "Food",
+       title = "Proportion of compound intake by contributing food")
+
+top_panel <- plot_grid(A, C, B, ncol = 3, nrow = 1,
+                       labels = c("A", "B", "C"), rel_widths = c(1, 1, 0.5))
+figure_reaction <- plot_grid(top_panel, top_foods, nrow = 2, ncol = 1,
+                             rel_heights = c(0.7, 1), labels = c("", "D"))
+figure_reaction
+
+save_plot(filename = "figures/ZIM/figure_z_reaction_info.png", figure_reaction,
+          base_height = 10, base_width = 17)
+```
+
+```{r reaction organisms}
+genus_counts <- diet_microbe_hits %>%
+  filter(reaction %in% sig_reactions_ffq) %>%
+  select(diet, reaction, organisms) %>%
+  mutate(orgs = parse_py_list_orgs(organisms)) %>%
+  unnest(orgs) %>%
+  select(-organisms) %>%
+  distinct() %>%
+  group_by(diet) %>%
+  mutate(genus = str_extract(orgs, "(?<=g__)[^.]+")) %>%
+  count(reaction, genus, name = "n") %>%
+  na.omit() %>%
+  mutate(reaction_label = recode(reaction, !!!reaction_labels)) %>%
+  ungroup()
+
+rn_organism <- ggplot(genus_counts, aes(x = reaction_label, y = genus, fill = n)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "grey", high = "darkred", name = "Number of\nSpecies") +
+  theme_bw() +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 20)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(x = "Reaction", y = "Genus", fill = "Count") +
+  facet_grid(~ diet)
+
+save_plot(filename = "figures/ZIM/figure_z_rn_organism.png", rn_organism,
+          base_height = 10, base_width = 12)
+```
+
+```{r reaction compounds table}
+all_ids <- results %>%
+  filter(reaction %in% sig_reactions_ffq) %>%
+  select(compound1_id, compound2_id) %>%
+  unlist() %>%
+  unique() %>%
+  na.omit()
+
+id_lookup  <- kegg_name_lookup(all_ids, kegg_names)
+id_to_name <- setNames(id_lookup$name, id_lookup$kegg_id)
+
+sig_reactions_table <- diet_microbe_hits %>%
+  filter(reaction %in% sig_reactions_ffq) %>%
+  select(compound1_id, reaction, compound2_id) %>%
+  mutate(
+    reaction       = recode(reaction, !!!reaction_labels),
+    compound1_name = recode(compound1_id, !!!id_to_name, .default = compound1_id),
+    compound2_name = recode(compound2_id, !!!id_to_name, .default = compound2_id)
+  ) %>%
+  select(`Food Compound ID`      = compound1_id,
+         `Food Compound`         = compound1_name,
+         Reaction                = reaction,
+         `Microbe Metabolite ID` = compound2_id,
+         `Microbe Metabolite`    = compound2_name) %>%
+  distinct() %>%
+  arrange(Reaction)
+
+save_as_image(flextable(sig_reactions_table), path = "figures/ZIM/table_z_sig_reactions.png")
+```
+
+## FFQ vs. all foods (FooDB)
+
+```{r pattern summary}
+pattern_summary <- results %>%
+  count(experiment, pattern_type, PID, name = "n") %>%
+  group_by(experiment, pattern_type) %>%
+  summarise(Average = round(mean(n), 2),
+            Median  = median(n),
+            Minimum = min(n),
+            Maximum = max(n),
+            .groups = "drop") %>%
+  mutate(experiment = label_zim_experiment(experiment)) %>%
+  rename(Analysis = experiment, `Pattern Type` = pattern_type)
+
+save_as_image(width(flextable(pattern_summary), j = "Analysis", width = 1.75),
+              path = "figures/ZIM/table_z_pattern_summary.png")
+```
+
+```{r composition all foods}
+diet_microbe_hits_all <- results %>%
+  filter(experiment == "DietMicrobe_AllFoods",
+         compound1_origin == "food", compound2_origin == "microbe")
+
+rm_all   <- build_reaction_matrix(diet_microbe_hits_all)
+comp_all <- reaction_composition_test(rm_all)
+
+comp_all$permanova
+comp_all$dispersion
+comp_all$pct_var
+comp_all$eig_check
+
+plot_reaction_pcoa(comp_all)
+```
+
+```{r simper all foods}
+simp_all <- simper_robustness(rm_all)
+simp_all$simper
+simp_all$permanova_reduced
+
+sig_reactions_all <- simp_all$sig_reactions
+```
+
+```{r node summary}
+# one row per compound occurrence, with HMDB taxonomy (kept when unclassified)
+df_base <- results %>%
+  select(experiment, matches("^compound[12]_(id|origin|assoc_food|freq)$")) %>%
+  pivot_longer(cols = matches("^compound[12]_"),
+               names_to = c("compound_num", ".value"),
+               names_pattern = "compound(\\d)_(.*)") %>%
+  filter(!is.na(id), id != "") %>%
+  mutate(origin = case_when(origin == "both" ~ "microbediet",
+                            origin == "food" ~ "diet",
+                            TRUE             ~ origin)) %>%
+  rename(kegg_id = id) %>%
+  left_join(hmdb, by = "kegg_id") %>%
+  filter(!is.na(origin)) %>%
+  distinct(kegg_id, origin, taxonomy_class, experiment, compound_num)
+
+df_base %>%
+  distinct(kegg_id, taxonomy_class) %>%
+  count(taxonomy_class, name = "n") %>%
+  mutate(perc = n / sum(n) * 100) %>%
+  arrange(desc(perc))
+
+class_counts <- df_base %>%
+  filter(!is.na(taxonomy_class)) %>%
+  count(origin, taxonomy_class, experiment, compound_num)
+
+class_levels <- sort(unique(class_counts$taxonomy_class))
+class_labels <- setNames(paste0(seq_along(class_levels), ". ", class_levels), class_levels)
+class_labels_wrapped <- setNames(str_wrap(class_labels, width = 25), names(class_labels))
+
+pal <- as.vector(createPalette(length(class_levels), c("#010101", "#ff0000")))
+names(pal) <- class_levels
+
+class_counts <- class_counts %>%
+  mutate(taxonomy_class = factor(taxonomy_class, levels = class_levels),
+         x_label = interaction(compound_num, origin, sep = " · "),
+         x_label = fct_reorder(x_label, as.integer(compound_num), .desc = TRUE))
+
+# classified vs. unclassified compound counts per bar
+totals_df <- df_base %>%
+  mutate(status = ifelse(is.na(taxonomy_class), "Unclassified", "Classified")) %>%
+  count(origin, experiment, compound_num, status) %>%
+  mutate(x_label = interaction(compound_num, origin, sep = " · "),
+         x_label = factor(x_label, levels = levels(class_counts$x_label)))
+
+# compounds behind the top 2 taxonomy classes per node/experiment
+top_class_per_label_experiment <- class_counts %>%
+  group_by(x_label, experiment, taxonomy_class) %>%
+  summarise(total_n = sum(n), .groups = "drop") %>%
+  group_by(x_label, experiment) %>%
+  mutate(proportion = total_n / sum(total_n)) %>%
+  slice_max(proportion, n = 2, with_ties = TRUE) %>%
+  ungroup()
+top_class_per_label_experiment
+
+summary_top_classes <- df_base %>%
+  filter(taxonomy_class %in% top_class_per_label_experiment$taxonomy_class) %>%
+  mutate(label = paste0(compound_num, " . ", origin)) %>%
+  select(-origin, -compound_num)
+
+summary_top_classes <- summary_top_classes %>%
+  left_join(kegg_name_lookup(summary_top_classes$kegg_id, kegg_names), by = "kegg_id") %>%
+  mutate(name_clean = paste0(kegg_id, ": ", name)) %>%
+  group_by(experiment, kegg_id) %>%
+  mutate(n_labels    = n_distinct(label),
+         multi_label = n_labels > 1) %>%
+  ungroup() %>%
+  mutate(experiment = label_zim_experiment(experiment))
+
+contributing_compounds <- ggplot(summary_top_classes, aes(x = label, y = name_clean)) +
+  geom_point(aes(color = multi_label), size = 3) +
+  scale_color_manual(values = c(`TRUE` = "red", `FALSE` = "green"),
+                     labels = c(`TRUE` = "Shared", `FALSE` = "Distinct")) +
+  facet_grid(taxonomy_class ~ experiment, scales = "free") +
+  theme_bw(base_size = 14) +
+  theme(legend.position = "bottom", legend.title = element_blank(),
+        plot.title = element_text(hjust = 0.5)) +
+  labs(x = NULL, y = NULL,
+       title = "Compounds contributing to top 3 chemical taxonomy classes\nby node and origin")
+
+save_plot(filename = "figures/ZIM/figure_z_contributing_compounds.png", contributing_compounds,
+          base_height = 20, base_width = 13, bg = "white")
+
+# stacked taxonomy-class proportions per node position and origin
+p_main <- class_counts %>%
+  mutate(experiment = label_zim_experiment(experiment)) %>%
+  ggplot(aes(x = x_label, y = n, fill = taxonomy_class)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = as.integer(taxonomy_class)), position = position_fill(vjust = 0.5),
+            size = 3, color = "grey4", fontface = "bold") +
+  scale_fill_manual(values = pal, labels = class_labels_wrapped) +
+  coord_flip() +
+  facet_wrap(~ experiment, ncol = 1, scales = "free_y") +
+  theme_bw() +
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.5),
+        plot.margin = ggplot2::margin(5.5, 5.5, 5.5, 5.5)) +
+  labs(x = NULL, y = "Proportion", fill = "Taxonomy Class",
+       title = "Proportion of compounds with classified chemical taxonomy per node position and origin")
+
+p_main_legend <- p_main +
+  theme(legend.position = "bottom", legend.title = element_text(angle = 90, hjust = 0.5)) +
+  guides(fill = guide_legend(nrow = 3))
+
+p_counts <- ggplot(totals_df, aes(x = x_label, y = n, fill = status)) +
+  geom_col() +
+  geom_text(aes(label = n), position = position_stack(vjust = 0.5), size = 3, fontface = "bold") +
+  scale_fill_manual(values = c(Classified = "grey90", Unclassified = "grey50")) +
+  coord_flip() +
+  facet_wrap(~ experiment, ncol = 1, scales = "free_y") +
+  theme_bw() +
+  theme(legend.position = "right", axis.text.y = element_blank(), axis.ticks.y = element_blank(),
+        strip.text = element_blank(), plot.title = element_text(hjust = 0.5),
+        plot.margin = ggplot2::margin(5.5, 5.5, 5.5, 5.5)) +
+  labs(x = NULL, y = "Number of compounds", fill = NULL,
+       title = "Total compounds\n(classified vs. unclassified)")
+
+# Jaccard similarity of classified compound sets
+group_sets <- df_base %>%
+  filter(!is.na(taxonomy_class)) %>%
+  mutate(experiment = label_zim_experiment(experiment),
+         group_id   = paste0(compound_num, " · ", origin, " · ", experiment)) %>%
+  group_by(group_id) %>%
+  summarise(compounds = list(unique(kegg_id)), .groups = "drop")
+
+sets_list   <- setNames(group_sets$compounds, group_sets$group_id)
+group_order <- group_sets$group_id
+
+sim_matrix <- expand_grid(group1 = group_order, group2 = group_order) %>%
+  mutate(similarity = map2_dbl(group1, group2, ~ jaccard(sets_list[[.x]], sets_list[[.y]])),
+         similarity = ifelse(group1 == group2, NA_real_, similarity),
+         group1 = factor(group1, levels = group_order),
+         group2 = factor(group2, levels = rev(group_order)))
+
+p_heatmap <- ggplot(sim_matrix, aes(x = group1, y = group2, fill = similarity)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = ifelse(is.na(similarity), "", sprintf("%.2f", similarity))), size = 3) +
+  scale_fill_gradient(low = "white", high = "#1b9e77", na.value = "grey90",
+                      limits = c(0, 1), name = "Jaccard\nsimilarity") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) +
+  scale_x_discrete(labels = label_wrap(width = 20)) +
+  scale_y_discrete(labels = label_wrap(width = 25)) +
+  labs(x = NULL, y = NULL,
+       title = "Similarity of classified compound sets by node position, origin, and experiment")
+```
+
+```{r compound enrichment}
+e_result <- taxonomy_class_enrichment(class_counts, hmdb, group_cols = c("experiment", "x_label"))
+sig_only <- e_result %>% filter(p_adj < 0.05)
+
+p_enrich <- sig_only %>%
+  mutate(experiment = label_zim_experiment(experiment)) %>%
+  ggplot(aes(y = x_label, x = reorder(taxonomy_class, log2_or),
+             size = neg_log10_p, color = log2_or)) +
+  geom_point() +
+  facet_grid(~ experiment) +
+  scale_color_gradient2(low = "steelblue", mid = "grey90", high = "firebrick", midpoint = 0,
+                        name = "log2(Odds Ratio)") +
+  scale_size_continuous(name = "-log10(FDR)", range = c(1, 8)) +
+  scale_x_discrete(labels = label_wrap(25)) +
+  labs(x = NULL, y = NULL) +
+  theme_bw(base_size = 10) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.y = element_text(lineheight = 0.7, vjust = 0.5))
+```
+
+```{r comparison summary, fig.height=10, fig.width=17}
+barplots <- plot_grid(p_main, p_counts, ncol = 2, rel_widths = c(2.2, 1),
+                      labels = c("A", "B"), align = "h", axis = "tb")
+bottom <- plot_grid(p_heatmap, p_enrich, ncol = 2, nrow = 1, labels = c("C", "D"))
+
+comparison_summary <- plot_grid(barplots, get_legend(p_main_legend), bottom,
+                                ncol = 1, nrow = 3, rel_heights = c(1, 0.3, 1))
+comparison_summary
+
+save_plot(filename = "figures/ZIM/figure_z_comparison_summary.png", comparison_summary,
+          base_height = 10, base_width = 17, bg = "white")
+```
+
+```{r ko enrichment, fig.height=15, fig.width=14}
+kos <- results %>%
+  mutate(kos = str_remove_all(KOs, "\\[|\\]|'")) %>%
+  separate_rows(kos, sep = ",\\s*") %>%
+  distinct(kos, experiment)
+
+enrich_res <- list(
+  DietMicrobe_FFQ      = run_ko_enrichment(kos$kos[kos$experiment == "DietMicrobe_FFQ"]),
+  DietMicrobe_AllFoods = run_ko_enrichment(kos$kos[kos$experiment == "DietMicrobe_AllFoods"])
+)
+
+combined_df <- imap_dfr(enrich_res, ~ as.data.frame(.x) %>% mutate(group = .y)) %>%
+  mutate(group = label_zim_experiment(group))
+
+enrichment <- combined_df %>%
+  mutate(category_label = ifelse(category == "Genetic Information Processing", "GIP*", category)) %>%
+  ggplot(aes(x = reorder(Description, -log10(p.adjust)), y = Count, fill = p.adjust)) +
+  geom_col() +
+  coord_flip() +
+  facet_grid(category_label ~ group, scales = "free", space = "free",
+             labeller = labeller(.rows = label_wrap_gen(width = 13))) +
+  scale_fill_gradient(low = "red", high = "blue") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        strip.text.y = element_text(angle = 0),
+        strip.clip = "off",
+        plot.caption = element_text(hjust = 0.5),
+        legend.position = "none",
+        axis.text.y = element_text(lineheight = 0.8, vjust = 0.5)) +
+  labs(x = "Pathway", y = "Gene Count", title = "KEGG Enrichment - All Categories",
+       caption = "*Genetic Information Processing")
+
+metabolism_category <- combined_df %>%
+  filter(category == "Metabolism") %>%
+  ggplot(aes(x = reorder(Description, -log10(p.adjust)), y = Count, fill = p.adjust)) +
+  geom_col() +
+  coord_flip() +
+  facet_grid(subcategory ~ group, scales = "free", space = "free",
+             labeller = labeller(.rows = label_wrap_gen(width = 20))) +
+  scale_fill_gradient(low = "red", high = "blue") +
+  scale_x_discrete(labels = label_wrap(width = 30)) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        strip.text.y = element_text(angle = 0),
+        strip.clip = "off",
+        plot.caption = element_text(hjust = 0.5)) +
+  labs(x = "Pathway", y = "Gene Count", title = "KEGG Enrichment - Category: Metabolism")
+
+ko_enrichment <- plot_grid(enrichment, metabolism_category, ncol = 2, labels = c("A", "B"))
+ko_enrichment
+
+save_plot(filename = "figures/ZIM/figure_z_ko_enrichment.png", ko_enrichment,
+          base_height = 19, base_width = 14, bg = "white")
+```
+
+```{r food hits, fig.height=15, fig.width=9}
+food_instance_complete <- results %>%
+  mutate(food = map(parse_py_list(compound1_assoc_food), unique)) %>%
+  unnest(food) %>%
+  mutate(food = str_trim(food)) %>%
+  filter(food != "", !is.na(food)) %>%
+  count(PID, experiment, diet, food, name = "n_instances") %>%
+  mutate(diet = factor(diet)) %>%
+  group_by(PID, experiment) %>%
+  complete(diet, food, fill = list(n_instances = 0)) %>%
+  ungroup()
+
+top_foods_names <- food_instance_complete %>%
+  group_by(experiment, food) %>%
+  summarise(total_n = mean(n_instances), .groups = "drop") %>%
+  group_by(experiment) %>%
+  slice_max(total_n, n = 100) %>%
+  ungroup() %>%
+  distinct(experiment, food)
+
+food_weights <- food_instance_complete %>%
+  inner_join(top_foods_names, by = c("experiment", "food")) %>%
+  mutate(experiment = label_zim_experiment(experiment)) %>%
+  ggplot(aes(x = reorder(food, n_instances), y = n_instances, fill = diet)) +
+  geom_col(position = position_dodge(width = 0.9), width = 0.8) +
+  coord_flip() +
+  facet_wrap(~ experiment, scales = "free_x") +
+  labs(title = "Average number of hit instances per food, by experiment",
+       x = NULL, y = "Average number of instances") +
+  scale_fill_manual(values = c(Agrarian = "darkgreen", Western = "chocolate3")) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5), legend.title = element_blank())
+food_weights
+
+save_plot(filename = "figures/ZIM/figure_z_food_weights.png", food_weights,
+          base_height = 15, base_width = 9, bg = "white")
+```
+
+## Immune recovery
+
+```{r immune recovery}
+longitudinal_metadata <- read_delim("data/ZIM/zim2_longitudinal.txt", delim = "\t",
+                                    escape_double = FALSE, trim_ws = TRUE)
+
+immune_markers <- c(
+  "CD4_Percent",
+  "CD4_HLADRpos_CD38pos_Percent",
+  "CD8_HLADRpos_CD38pos_Percent",
+  "CD4_PD1_Percent",
+  "CD8_PD1_Percent",
+  "IL6_pg_mL",
+  "CRP_mg_L"
+)
+
+marker_labels <- c(
+  CD4_Percent                  = "CD4+(%)",
+  CD4_HLADRpos_CD38pos_Percent = "CD4+HLADR+CD38+(%)",
+  CD8_HLADRpos_CD38pos_Percent = "CD8+HLADR+CD38+(%)",
+  CD4_PD1_Percent              = "CD4+PD1+(%)",
+  CD8_PD1_Percent              = "CD8+PD1+(%)",
+  IL6_pg_mL                    = "IL-6 (pg/mL)",
+  CRP_mg_L                     = "CRP (mg/L)"
+)
+
+# baseline diet score
+total_score <- longitudinal_metadata %>%
+  filter(Visit == 2, PID %in% sampleids) %>%
+  select(PID, Total_Score)
+
+# summed abundance of the SIMPER reactions per participant
+sum_sig_rxns <- results %>%
+  filter(reaction %in% sig_reactions_all) %>%
+  group_by(PID) %>%
+  summarise(sum_abundance = sum(abundance))
+
+# marker change: visit 3 - visit 2
+delta_df <- longitudinal_metadata %>%
+  filter(PID %in% sampleids) %>%
+  select(PID, Visit, all_of(immune_markers)) %>%
+  pivot_longer(all_of(immune_markers), names_to = "immune_marker", values_to = "value") %>%
+  pivot_wider(names_from = Visit, values_from = value, names_prefix = "V") %>%
+  mutate(delta = V3 - V2) %>%
+  select(PID, immune_marker, delta) %>%
+  mutate(delta_label = case_when(delta < 0  ~ "negative",
+                                 delta > 0  ~ "positive",
+                                 delta == 0 ~ "no change"),
+         im_label = recode(immune_marker, !!!marker_labels))
+
+# distinct reactions per participant (FFQ experiment)
+sum_rxns <- results %>%
+  filter(experiment == "DietMicrobe_FFQ") %>%
+  group_by(PID, gender, cohort, diet) %>%
+  summarise(n_rxns = n_distinct(reaction), .groups = "drop")
+
+im_analysis_df <- sum_rxns %>%
+  left_join(total_score, by = "PID") %>%
+  left_join(delta_df, by = "PID") %>%
+  left_join(sum_sig_rxns, by = "PID") %>%
+  na.omit()
+
+naive_im_analysis <- im_analysis_df %>% filter(cohort == "Naïve")
+
+# naïve cohort: marker change
+fit_lm_by_marker(naive_im_analysis, delta ~ n_rxns + Total_Score, "immune_marker", immune_markers)
+fit_lm_by_marker(naive_im_analysis, delta ~ n_rxns, "immune_marker", immune_markers)
+
+ggplot(naive_im_analysis, aes(x = Total_Score, y = n_rxns)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  stat_cor(method = "pearson")
+
+# all cohorts: baseline marker level
+baseline_im_analysis <- longitudinal_metadata %>%
+  filter(Visit == 2, PID %in% sampleids) %>%
+  select(PID, Total_Score, all_of(immune_markers)) %>%
+  pivot_longer(cols = all_of(immune_markers), names_to = "marker", values_to = "value") %>%
+  left_join(sum_sig_rxns, by = "PID") %>%
+  left_join(sum_rxns, by = "PID")
+
+fit_lm_by_marker(baseline_im_analysis, value ~ n_rxns + cohort + Total_Score, "marker", immune_markers)
+
+# mediation: Total_Score -> n_rxns -> marker change
+mediation_results <- map_dfr(immune_markers, function(i) {
+  data_sub <- naive_im_analysis %>% filter(immune_marker == i)
+
+  # mediate() refits via update(), which looks these up in the global env
+  assign("mM_f", n_rxns ~ Total_Score, envir = .GlobalEnv)
+  assign("mY_f", delta ~ Total_Score + n_rxns, envir = .GlobalEnv)
+  assign("data_sub", data_sub, envir = .GlobalEnv)
+
+  mM <- lm(mM_f, data = data_sub)
+  mY <- lm(mY_f, data = data_sub)
+
+  res <- mediation::mediate(mM, mY, treat = "Total_Score", mediator = "n_rxns",
+                            boot = TRUE, sims = 500)
+
+  if (res$d0.p <= 0.05) {
+    message("Significant mediation for marker: ", i)
+    print(summary(res))
+  }
+
+  tibble(immune_marker   = i,
+         predictor       = "Total_Score",
+         mediator        = "n_rxns",
+         response        = "delta",
+         acme            = res$d0,
+         acme_p          = res$d0.p,
+         ade             = res$z0,
+         ade_p           = res$z0.p,
+         total_effect    = res$tau.coef,
+         total_p         = res$tau.p,
+         prop_mediated   = res$n0,
+         prop_mediated_p = res$n0.p)
+})
+
+rm(mM_f, mY_f, data_sub, envir = .GlobalEnv)
+mediation_results
+```
+
+## Session info
+
+```{r session info}
+sessioninfo::session_info()
+```

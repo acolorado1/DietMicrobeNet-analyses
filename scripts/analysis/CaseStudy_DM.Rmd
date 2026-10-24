@@ -1,0 +1,479 @@
+---
+title: "Application of DietMicrobeNet in DietModification Cohort"
+author: "Angela Sofia Burkhart Colorado"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 5
+---
+
+```{css, echo = F}
+h1, h4 {
+  text-align: center;
+  color: #007791;
+}
+h2, h3 {
+  color: cadetblue;
+}
+```
+
+```{r setup, include = FALSE}
+# ---- path to the DietMicrobeNet HMDB table ----
+hmdb_path <- "~/Code_Projs/DietMicrobeNet/Data/hmdb.csv"
+
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      fig.align = "center", out.width = "100%", out.height = "100%")
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+## Packages
+
+```{r packages}
+library(tidyverse)
+library(readxl)
+library(scales)
+library(ggpubr)
+library(gt)
+
+source(here::here("R", "functions.R"))
+dir.create("figures/DM", recursive = TRUE, showWarnings = FALSE)
+```
+
+## Data
+
+```{r data}
+ko_abundance_shotgun <- read_tsv("data/DM/DM_KOs_shotgun.tsv")
+metadata   <- read_excel("data/DM/metadata.xlsx")
+hmdb       <- read_hmdb(hmdb_path)
+hmdb_u     <- hmdb %>% distinct(kegg_id, .keep_all = TRUE)
+kegg_names <- kegg_compound_names("data/cache/kegg_compound_names.rds")
+host_kos   <- read_csv("data/host_genome/noquote_ko_host.txt", col_names = "ko")
+
+sampleids <- colnames(ko_abundance_shotgun)[-1]
+metadata %>%
+  filter(SampleID %in% sampleids) %>%
+  count(Diet, name = "n_diet")
+
+all_data <- read_collapsed_results("data/DM/graph_results_DM.csv.gz") %>%
+  filter(output == "output_dmh") %>%
+  mutate(ID = run_dir) %>%
+  select(ID, everything(), -run_dir, -output)
+
+n_distinct(all_data$ID)
+
+all_data$RecordID <- sub("\\.1$", "", all_data$ID)
+
+results <- metadata %>%
+  distinct(RecordID, Diet) %>%
+  right_join(all_data, by = "RecordID")
+```
+
+## Q1: Dietary compounds used by microbes (node 1)
+
+```{r sanity checks}
+# participants assigned more than one diet
+metadata %>%
+  group_by(RecordID) %>%
+  summarise(n_diets    = n_distinct(Diet, na.rm = TRUE),
+            diets_seen = paste(unique(na.omit(Diet)), collapse = ", "),
+            .groups = "drop") %>%
+  filter(n_diets > 1)
+
+# TMA/O pathway
+ko_abundance_shotgun[startsWith(ko_abundance_shotgun$`Gene Family`, "K20038"), ]
+results %>% filter(compound1_id == "C00114")
+
+# diet -> microbe -> host patterns
+results %>%
+  filter(compound1_origin == "diet", compound2_origin == "microbe", compound3_origin == "host")
+```
+
+```{r node heatmap, fig.width=11, fig.height=10}
+res_use <- results %>% filter(RecordID %in% unique(metadata$RecordID))
+n_total <- n_distinct(res_use$RecordID)
+
+# one row per individual x node x compound, for paths whose microbial step has reads
+long <- res_use %>%
+  filter(edge1_m_abundance > 0) %>%
+  select(RecordID, matches("^compound[123]_(id|origin)$")) %>%
+  pivot_longer(-RecordID,
+               names_to = c("node", ".value"),
+               names_pattern = "compound(\\d)_(id|origin)") %>%
+  rename(kegg_id = id) %>%
+  filter(!is.na(kegg_id)) %>%
+  distinct(RecordID, node, origin, kegg_id)
+
+heat_dat <- long %>%
+  left_join(hmdb_u, by = "kegg_id") %>%
+  filter(!is.na(taxonomy_class)) %>%
+  count(node, origin, taxonomy_super_class, taxonomy_class, name = "n") %>%
+  mutate(mean_per_patient = n / n_total)
+
+# classified vs. unclassified compounds
+long %>%
+  left_join(hmdb_u, by = "kegg_id") %>%
+  distinct(kegg_id, taxonomy_class) %>%
+  summarise(na_count = sum(is.na(taxonomy_class)),
+            not_na   = sum(!is.na(taxonomy_class)))
+
+diet_node1 <- long %>%
+  filter(node == 1, origin == "diet") %>%
+  left_join(hmdb_u, by = "kegg_id") %>%
+  filter(!is.na(taxonomy_class))
+
+diet_tab <- diet_node1 %>%
+  left_join(kegg_names, by = "kegg_id") %>%
+  group_by(taxonomy_super_class, taxonomy_class) %>%
+  summarise(n = n(),
+            mean_per_patient = n / n_total,
+            individuals = n_distinct(RecordID),
+            compounds = paste(sort(unique(compound_name)), collapse = "; "),
+            .groups = "drop") %>%
+  arrange(desc(mean_per_patient))
+
+diet_compounds <- diet_node1 %>%
+  group_by(taxonomy_class, kegg_id) %>%
+  summarise(individuals = n_distinct(RecordID), .groups = "drop") %>%
+  left_join(kegg_names, by = "kegg_id") %>%
+  select(taxonomy_class, kegg_id, compound_name, individuals) %>%
+  arrange(taxonomy_class, desc(individuals))
+
+diet_gt <- diet_tab %>%
+  select(taxonomy_super_class, taxonomy_class, n, mean_per_patient, individuals, compounds) %>%
+  gt() %>%
+  cols_label(
+    taxonomy_super_class = "Super class",
+    taxonomy_class       = "Class",
+    n                    = "Detections (n)",
+    mean_per_patient     = "Mean per individual",
+    individuals          = "Individuals",
+    compounds            = "Compounds"
+  ) %>%
+  fmt_number(mean_per_patient, decimals = 2) %>%
+  cols_align("left", c(taxonomy_super_class, taxonomy_class, compounds)) %>%
+  cols_width(compounds ~ px(350)) %>%
+  tab_header(title = "Diet-only compounds at node 1") %>%
+  tab_source_note(paste0("Mean per individual = detections / ", n_total,
+                         " individuals. Individuals = number with at least one compound in the class."))
+diet_gt
+# gtsave(diet_gt, "figures/DM/table_node1.png")
+
+p_nodes_origin <- heat_dat %>%
+  mutate(taxonomy_super_class = str_squish(str_remove(taxonomy_super_class, "compounds")),
+         origin = factor(origin, levels = c("diet", "microbe", "host", "microbediet",
+                                            "hostdiet", "hostmicrobe", "all"))) %>%
+  ggplot(aes(x = node, y = taxonomy_class, fill = mean_per_patient)) +
+  geom_tile() +
+  scale_fill_gradient(low = "#00203FFF", high = "#ADEFD1FF",
+                      name = "Mean compounds\nper individual",
+                      trans = "log10", labels = label_comma()) +
+  facet_grid(taxonomy_super_class ~ origin, scales = "free", space = "free",
+             labeller = label_wrap_gen(width = 20)) +
+  theme_bw() +
+  theme(strip.text.y = element_text(angle = 0),
+        plot.title = element_text(hjust = 0.5),
+        axis.text = element_text(size = 12),
+        legend.position = "bottom") +
+  guides(fill = guide_colorbar(barwidth = unit(4, "cm"))) +
+  labs(x = "Node", y = "Chemical Taxonomy Class",
+       title = "Number of Compounds by Node Position and Origin")
+p_nodes_origin
+
+ggsave(filename = "figures/DM/compound_nodes.png", p_nodes_origin, width = 14, height = 15)
+```
+
+## Q2: Host capability (edge 2)
+
+```{r host enrichment, fig.height=15, fig.width=10}
+# host KOs reachable from the microbiome, restricted to the host reference genome
+kos <- results %>%
+  filter(edge1_m_abundance > 0) %>%
+  distinct(RecordID, edge2_KOs) %>%
+  mutate(ko = parse_py_list(edge2_KOs)) %>%
+  unnest(ko) %>%
+  distinct(RecordID, ko) %>%
+  filter(ko %in% host_kos$ko)
+
+# KOs present in at least `min_patients` patients
+min_patients <- 1
+ko_set <- kos %>% count(ko) %>% filter(n >= min_patients) %>% pull(ko)
+
+# background = all KOs in the host reference genome
+enrich_host_df <- run_ko_enrichment(ko_set,
+                                    universe     = unique(host_kos$ko),
+                                    pvalueCutoff = 1,
+                                    qvalueCutoff = 1) %>%
+  as.data.frame()
+
+sig <- enrich_host_df %>% filter(p.adjust < 0.05)
+
+# ko04981 (Folate transport and metabolism) has no KEGG category
+sum(is.na(sig$category))
+sig[is.na(sig$subcategory) & is.na(sig$category), "subcategory"] <- "Digestive system"
+sig[is.na(sig$category), "category"] <- "Organismal Systems"
+
+p_host_enrichment <- sig %>%
+  mutate(category = ifelse(category == "Genetic Information Processing", "GIP*", category)) %>%
+  ggplot(aes(x = reorder(Description, -log10(p.adjust)), y = Count, fill = p.adjust)) +
+  geom_col() +
+  coord_flip() +
+  facet_grid(category ~ ., scales = "free_y", space = "free_y",
+             labeller = labeller(.rows = label_wrap_gen(width = 13))) +
+  scale_fill_gradient(low = "red", high = "blue") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5),
+        strip.text.y = element_text(angle = 0),
+        strip.clip = "off",
+        axis.text.y = element_text(lineheight = 0.8, vjust = 0.5)) +
+  labs(x = "Pathway", y = "Gene Count", title = "Host KEGG Enrichment",
+       caption = "*Genetic Information Processing")
+p_host_enrichment
+
+ggsave(filename = "figures/DM/host_gene_enrichment.png", p_host_enrichment, width = 10, height = 15)
+```
+
+```{r host kos vs markers, fig.height=10, fig.width=9}
+markers_keep    <- c("LDL", "HDL", "IL6", "CRP", "LBP",
+                     "CD4+CD40+", "CD4+ PD1+", "CD8+CD40+", "CD8+PD1+")
+drop_overview   <- TRUE   # drop KEGG "Global and overview maps"
+min_pairs       <- 8      # min patients for a count correlation
+min_pairs_model <- 10     # min patients for the regression models
+min_minor       <- 2      # KO present in >= this many patients and absent in >= this many
+min_blocks      <- 2      # pathway needs >= this many independent KO blocks
+
+# one row per KO in each significantly enriched pathway
+sig_ko <- sig %>%
+  select(category, subcategory, Description, geneID) %>%
+  filter(!(drop_overview & subcategory %in% "Global and overview maps")) %>%
+  separate_rows(geneID, sep = "/") %>%
+  rename(ko = geneID) %>%
+  distinct()
+
+# host KOs available to each patient (edges whose microbial step has reads)
+host_ko <- results %>%
+  filter(edge1_m_abundance > 0) %>%
+  distinct(RecordID, edge2_KOs) %>%
+  mutate(ko = str_extract_all(edge2_KOs, "K\\d{5}")) %>%
+  unnest(ko) %>%
+  distinct(RecordID, ko)
+
+sig_ko_host <- inner_join(sig_ko, host_ko, by = "ko", relationship = "many-to-many")
+
+patients <- unique(host_ko$RecordID)
+diet_key <- metadata %>% distinct(RecordID, Diet)
+
+# marker change from week 1
+host_deltas <- metadata %>%
+  select(RecordID, Week, all_of(markers_keep)) %>%
+  filter(RecordID %in% patients) %>%
+  pivot_longer(-c(RecordID, Week), names_to = "marker", values_to = "value",
+               values_transform = as.numeric) %>%
+  pivot_wider(names_from = Week, values_from = value, names_prefix = "wk") %>%
+  mutate(d_wk2 = wk2 - wk1,
+         d_wk3 = wk3 - wk1)
+
+deltas_long <- host_deltas %>%
+  pivot_longer(c(d_wk2, d_wk3), names_to = "change", values_to = "delta") %>%
+  filter(!is.na(delta)) %>%
+  left_join(diet_key, by = "RecordID")
+
+description_category <- sig_ko %>%
+  distinct(Description, .keep_all = TRUE) %>%
+  select(Description, category)
+
+# number of KOs vs marker change, at three levels
+cors_levels <- map_dfr(c(category = "category", subcategory = "subcategory", pathway = "Description"),
+                       cor_by_level,
+                       sig_ko_host = sig_ko_host, deltas_long = deltas_long,
+                       patients = patients, min_pairs = min_pairs,
+                       .id = "level") %>%
+  arrange(p)
+
+knitr::kable(cors_levels %>% filter(p < 0.05))
+
+p_cors <- cors_levels %>%
+  filter(level == "pathway") %>%
+  rename(Description = group) %>%
+  left_join(description_category, by = "Description") %>%
+  mutate(star   = if_else(p < 0.05, "*", ""),
+         change = ifelse(change == "d_wk2", "Week 2 - Week 1", "Week 3 - Week 1")) %>%
+  ggplot(aes(marker, reorder(Description, rho), fill = rho)) +
+  geom_tile(colour = "white") +
+  geom_text(aes(label = star)) +
+  facet_grid(category ~ change, scales = "free", space = "free_y",
+             labeller = labeller(category = label_wrap_gen(20))) +
+  scale_fill_gradient2(low = "#00203FFF", mid = "white", high = "#4DB6A0",
+                       limits = c(-1, 1), name = "rho") +
+  theme_bw() +
+  theme(strip.text.y = element_text(angle = 0), strip.clip = "off",
+        axis.text.x = element_text(angle = 60, hjust = 1),
+        plot.title = element_text(hjust = 0.5)) +
+  labs(x = NULL, y = NULL, title = "Spearman Correlation\nNumber of host KOs vs marker change")
+p_cors
+
+ggsave("figures/DM/marker_cors.png", plot = p_cors, width = 9, height = 10)
+```
+
+```{r detailed plots, fig.width=10, fig.height=15}
+tied_paths <- c("Thiamine metabolism", "Taurine and hypotaurine metabolism",
+                "Phenylalanine, tyrosine and tryptophan biosynthesis",
+                "Pantothenate and CoA biosynthesis", "One carbon pool by folate",
+                "Folate biosynthesis", "Carbon fixation by Calvin cycle",
+                "Arginine biosynthesis", "Phenylalanine metabolism",
+                "Isoquinoline alkaloid biosynthesis")
+
+interesting_cors <- cors_levels %>%
+  filter(level == "pathway", p < 0.05) %>%
+  distinct(group, marker, change)
+
+n_sig_ko_host <- sig_ko_host %>%
+  filter(Description %in% interesting_cors$group) %>%
+  count(RecordID, group = Description, name = "n_ko")
+
+detail_df <- deltas_long %>%
+  select(RecordID, marker, change, delta, Diet) %>%
+  left_join(n_sig_ko_host, by = "RecordID", relationship = "many-to-many") %>%
+  semi_join(interesting_cors, by = c("change", "marker", "group"))
+
+p_detailcor_1 <- detail_df %>%
+  filter(!group %in% tied_paths) %>%
+  mutate(change = ifelse(change == "d_wk2", "Week 2 - Week 1", "Week 3 - Week 1")) %>%
+  ggplot(aes(x = delta, y = n_ko, color = Diet)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  stat_cor(method = "spearman", label.x = 0, label.y.npc = "bottom") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  facet_grid(group ~ change + marker, scales = "free", labeller = label_wrap_gen(width = 17)) +
+  theme_bw() +
+  theme(strip.text.y = element_text(angle = 0),
+        strip.clip = "off",
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5)) +
+  labs(x = "Delta", y = "Number of KOs",
+       title = "Correlations of Markers Stratified by Diet - No Ties",
+       subtitle = "Deltas and markers were chosen from correlation heatmap")
+p_detailcor_1
+
+ggsave(filename = "figures/DM/p_detailcor.png", p_detailcor_1, width = 15, height = 12)
+
+p_detailcor_2 <- detail_df %>%
+  filter(change == "d_wk3", group %in% tied_paths) %>%
+  ggplot(aes(x = delta, y = n_ko, color = Diet)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  stat_cor(method = "spearman", label.x.npc = "middle") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  facet_grid(group ~ marker, scales = "free", labeller = label_wrap_gen(width = 15)) +
+  theme_bw() +
+  theme(strip.text.y = element_text(angle = 0),
+        strip.clip = "off",
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5)) +
+  labs(x = "Delta (Week3 - Week1)", y = "Number of KOs",
+       title = "Correlations of Markers Stratified by Diet - Ties Between Markers",
+       subtitle = "Deltas and markers were chosen from correlation heatmap")
+p_detailcor_2
+
+ggsave(filename = "figures/DM/p_detailcor_ties.png", p_detailcor_2, width = 10, height = 15)
+```
+
+```{r ko variation}
+# patient x KO presence matrix
+ko_pa <- sig_ko_host %>%
+  distinct(RecordID, ko) %>%
+  mutate(v = 1) %>%
+  pivot_wider(names_from = ko, values_from = v, values_fill = 0)
+mat <- as.matrix(select(ko_pa, -RecordID))
+rownames(mat) <- ko_pa$RecordID
+
+# informative KOs, collapsed into blocks with identical patient profiles
+prev    <- colSums(mat)
+var_ko  <- names(prev)[prev >= min_minor & prev <= nrow(mat) - min_minor]
+profile <- apply(mat[, var_ko, drop = FALSE], 2, paste, collapse = "")
+blocks  <- tibble(ko = var_ko, block = paste0("B", match(profile, unique(profile))))
+c(variable_KOs = length(var_ko), independent_blocks = n_distinct(blocks$block))
+
+bmat <- mat[, var_ko[!duplicated(profile)], drop = FALSE]
+colnames(bmat) <- paste0("B", seq_len(ncol(bmat)))
+bmat_long <- as_tibble(bmat, rownames = "RecordID") %>%
+  pivot_longer(-RecordID, names_to = "block", values_to = "has")
+
+# pathway score = share of the pathway's blocks a patient carries
+pw_block <- sig_ko_host %>%
+  distinct(Description, ko) %>%
+  inner_join(blocks, by = "ko") %>%
+  distinct(Description, block)
+
+# pathways with identical block sets: keep one, record the rest
+pw_alias <- pw_block %>%
+  group_by(Description) %>%
+  summarise(key = paste(sort(block), collapse = "|"), n_blocks = n(), .groups = "drop") %>%
+  filter(n_blocks >= min_blocks) %>%
+  group_by(key) %>%
+  summarise(same_as = paste(Description, collapse = "; "),
+            Description = first(Description),
+            .groups = "drop")
+
+score <- pw_block %>%
+  filter(Description %in% pw_alias$Description) %>%
+  inner_join(bmat_long, by = "block", relationship = "many-to-many") %>%
+  group_by(RecordID, Description) %>%
+  summarise(frac = mean(has), .groups = "drop")
+
+model_res <- score %>%
+  inner_join(deltas_long, by = "RecordID", relationship = "many-to-many") %>%
+  group_by(Description, marker, change) %>%
+  filter(n() >= min_pairs_model, n_distinct(frac) > 2, n_distinct(Diet) == 2) %>%
+  nest(data = c(RecordID, frac, delta, wk1, Diet)) %>%
+  mutate(res = map(data, fit_marker_models)) %>%
+  select(-data) %>%
+  unnest(res) %>%
+  ungroup() %>%
+  filter(!is.na(p_main)) %>%
+  group_by(marker, change) %>%
+  mutate(q_main = p.adjust(p_main, "BH"),
+         q_int  = p.adjust(p_int, "BH")) %>%
+  ungroup() %>%
+  mutate(q_main_all = p.adjust(p_main, "BH"),
+         q_int_all  = p.adjust(p_int, "BH")) %>%
+  left_join(select(pw_alias, Description, same_as), by = "Description") %>%
+  arrange(p_int)
+
+model_res %>% filter(p_main < 0.05 | p_int < 0.05)
+```
+
+```{r ldl by n reactions}
+n_rx <- results %>%
+  distinct(RecordID, Diet, edge2_reaction) %>%
+  count(Diet, RecordID)
+
+metadata %>%
+  select(RecordID, LDL, Week) %>%
+  filter(Week %in% c(1, 2)) %>%
+  mutate(LDL = as.numeric(as.character(LDL))) %>%
+  pivot_wider(names_from = Week, values_from = LDL, names_prefix = "Week_") %>%
+  mutate(LDL_change = Week_2 - Week_1) %>%
+  left_join(n_rx, by = "RecordID") %>%
+  na.omit() %>%
+  ggplot(aes(x = n, y = LDL_change, color = Diet)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  stat_cor(method = "pearson") +
+  theme_bw() +
+  labs(x = "number of reactions")
+```
+
+## Q3: RNA-seq verification
+
+```{r rna seq}
+
+```
+
+## Session info
+
+```{r session info}
+sessioninfo::session_info()
+```

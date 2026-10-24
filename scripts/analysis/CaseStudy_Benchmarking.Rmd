@@ -1,0 +1,201 @@
+---
+title: "Case Study: Benchmarking"
+author: "Angela Sofia Burkhart Colorado"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 6
+---
+
+```{css, echo = F}
+h1, h4 {
+  text-align: center;
+  color: #007791;
+}
+h2, h3 {
+  color: cadetblue;
+}
+```
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      fig.align = "center", out.width = "100%", out.height = "100%")
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+## Packages
+
+```{r packages}
+library(tidyverse)
+library(gt)
+library(cowplot)
+library(lme4)
+library(lmerTest)
+library(performance)
+
+source(here::here("R", "functions.R"))
+dir.create("figures/benchmarking", recursive = TRUE, showWarnings = FALSE)
+options(scipen = 999)
+set.seed(5)
+```
+
+## Data
+
+```{r load data}
+experiment_order <- c("hg_mgx", "hg_mtx", "htx_mgx", "htx_mtx")
+
+df <- read_csv("data/benchmarking/benchmark_all_results_with_network_stats.csv", show_col_types = FALSE) %>%
+  mutate(experiment_type = factor(experiment_type, levels = experiment_order),
+         across(where(is.numeric), ~ replace_na(., 0)),
+         source = case_when(source == "DM"        ~ "DM (dmh + all foods)",
+                            source == "DM (FFQ)"  ~ "DM (dmh + FFQ)",
+                            source == "IBD"       ~ "IBD (dmh + all foods)",
+                            source == "ZIM"       ~ "ZIM (dm + FFQ)",
+                            source == "ZIM (dmh)" ~ "ZIM (dmh + FFQ)"))
+
+df %>%
+  group_by(source, food_representation) %>%
+  summarise(host_kos = sum(n_ko_host), .groups = "drop")
+```
+
+## Tables
+
+```{r general stats table, fig.width=10}
+metric_labels <- c(
+  n              = "n",
+  runtime_sec    = "Runtime (s)",
+  peak_memory_mb = "Peak memory (MB)",
+  n_reactions    = "Reactions (n)",
+  n_nodes        = "Network nodes (n)",
+  n_edges        = "Network edges (n)",
+  shannon        = "Shannon diversity",
+  n_taxa         = "Taxa observed (n)",
+  n_ko           = "Microbial KOs (n)",
+  n_ko_host      = "Host KOs (n)"
+)
+
+summary_long <- df %>%
+  select(source, runtime_sec, peak_memory_mb, n_reactions, n_nodes, n_edges,
+         shannon, n_taxa, n_ko, n_ko_host) %>%
+  pivot_longer(-source, names_to = "metric", values_to = "value") %>%
+  group_by(source, metric) %>%
+  summarise(mean_sd = sprintf("%.1f ± %.1f", mean(value, na.rm = TRUE), sd(value, na.rm = TRUE)),
+            .groups = "drop") %>%
+  pivot_wider(names_from = source, values_from = mean_sd)
+
+n_row <- df %>%
+  count(source, name = "n") %>%
+  pivot_wider(names_from = source, values_from = n) %>%
+  mutate(metric = "n", across(-metric, as.character)) %>%
+  relocate(metric)
+
+table_gen_stats <- bind_rows(n_row, summary_long) %>%
+  mutate(metric = recode(metric, !!!metric_labels)) %>%
+  arrange(match(metric, metric_labels)) %>%
+  gt(rowname_col = "metric") %>%
+  tab_header(title = "Per sample benchmarking by study") %>%
+  cols_width(stub() ~ px(150), everything() ~ px(170)) %>%
+  tab_source_note("Values are mean ± SD across all participants.")
+
+table_gen_stats
+# gtsave(table_gen_stats, "figures/benchmarking/table_b_gen_stats.png")
+```
+
+## Resource-use models
+
+```{r models}
+model_df <- df %>%
+  select(participant_id, source, runtime_sec, peak_memory_mb, n_ko, n_taxa, shannon) %>%
+  mutate(study = if_else(str_starts(source, "DM"), "DM", "ZIM"),
+         host  = if_else(source == "ZIM (dm + FFQ)", "no", "yes"),
+         diet  = if_else(source == "DM (dmh + all foods)", "all foods", "FFQ"))
+
+memory_model_df <- model_df %>%
+  filter(host == "yes") %>%
+  mutate(n_ko_k = n_ko / 1000)
+
+# Shannon vs number of taxa as the diversity term
+mem  <- fit_diversity_pair("peak_memory_mb", model_df,        c("study", "host", "diet"))
+run  <- fit_diversity_pair("runtime_sec",    model_df,        c("study", "host", "diet"))
+mem2 <- fit_diversity_pair("peak_memory_mb", memory_model_df, c("study", "diet"))
+
+compare_performance(mem$shan,  mem$taxa,  metrics = c("AIC", "BIC", "R2", "RMSE"))
+compare_performance(run$shan,  run$taxa,  metrics = c("AIC", "BIC", "R2", "RMSE"))
+compare_performance(mem2$shan, mem2$taxa, metrics = c("AIC", "BIC", "R2", "RMSE"))
+
+# full models
+m_runtime <- lmer(runtime_sec ~ n_taxa + n_ko + study + host + diet + (1 | participant_id),
+                  data = model_df)
+m_memory  <- lmer(peak_memory_mb ~ n_taxa + n_ko + study + diet + (1 | participant_id),
+                  data = memory_model_df)
+summary(m_runtime)
+summary(m_memory)
+
+# full vs reduced (likelihood-ratio tests)
+m_mem_full <- lmer(peak_memory_mb ~ n_ko_k + n_taxa + study + diet + (1 | participant_id),
+                   data = memory_model_df, REML = FALSE)
+m_mem_red  <- lmer(peak_memory_mb ~ n_ko_k + (1 | participant_id),
+                   data = memory_model_df, REML = FALSE)
+anova(m_mem_red, m_mem_full)
+
+m_run_full <- lmer(runtime_sec ~ n_ko + n_taxa + study + host + diet + (1 | participant_id),
+                   data = model_df, REML = FALSE)
+m_run_red  <- lmer(runtime_sec ~ host + diet + (1 | participant_id),
+                   data = model_df, REML = FALSE)
+anova(m_run_red, m_run_full)
+
+# final estimates (REML)
+m_mem_final <- update(m_mem_red, REML = TRUE)
+m_run_final <- update(m_run_red, REML = TRUE)
+
+confint(m_mem_final, method = "Wald")
+confint(m_run_final, method = "Wald")
+icc(m_mem_final)
+icc(m_run_final)
+confint(m_mem_final, method = "profile")
+confint(m_run_final, method = "profile")
+
+# memory cost of host data, KOs centred at 3,000
+model_df <- model_df %>% mutate(n_ko_c = n_ko / 1000 - 3)
+m_mem_host <- lmer(peak_memory_mb ~ n_ko_c + host + (1 | participant_id), data = model_df)
+confint(m_mem_host, method = "profile")
+```
+
+## Figures
+
+```{r figures, fig.width=10}
+c_runtime <- source_boxplot(df, "runtime_sec",    "Runtime (s)")
+c_memory  <- source_boxplot(df, "peak_memory_mb", "Peak memory (MB)")
+
+p_size <- df %>%
+  transmute(source, origin = "Microbe", count = na_if(n_ko, 0)) %>%
+  source_boxplot("count", "KO Count") +
+  facet_wrap(~ origin, scales = "free_y")
+
+diversity_long <- df %>%
+  select(source, shannon, n_taxa) %>%
+  pivot_longer(c(shannon, n_taxa), names_to = "metric", values_to = "value") %>%
+  mutate(metric = recode(metric, shannon = "Shannon diversity", n_taxa = "Taxa observed"))
+
+p_diversity <- source_boxplot(diversity_long, "value", "Value") +
+  facet_wrap(~ metric, scales = "free_y")
+p_legend <- source_boxplot(diversity_long, "value", "Value", legend = "bottom")
+
+top_row    <- plot_grid(p_size, p_diversity, nrow = 1, labels = c("A", "B"), rel_widths = c(0.8, 1))
+bottom_row <- plot_grid(c_runtime, c_memory, nrow = 1, labels = c("C", "D"), rel_widths = c(0.9, 1))
+
+f_benchmarking <- plot_grid(top_row, bottom_row, get_legend(p_legend),
+                            rel_heights = c(1, 1, 0.1), nrow = 3)
+f_benchmarking
+
+save_plot(filename = "figures/benchmarking/figure_b_benchmarking.png", f_benchmarking,
+          base_width = 10, base_height = 7, bg = "white")
+```
+
+## Session info
+
+```{r session info}
+sessioninfo::session_info()
+```
