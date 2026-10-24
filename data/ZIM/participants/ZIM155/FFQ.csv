@@ -1,0 +1,31 @@
+"food","score","raw_perc","perc","FooDB"
+"Butter",1.5,2.02702702702703,2,"Butter"
+"Margarine",1.5,2.02702702702703,2,"Margarine"
+"Avocado",2,2.7027027027027,2,"Avocado"
+"Plum",2,2.7027027027027,2,"European plum"
+"Fries",1,1.35135135135135,1,"Potato"
+"Friedpotatoes",1,1.35135135135135,1,"Potato"
+"Roastedpotatoes",1,1.35135135135135,1,"Potato"
+"FriedChicken",1.5,2.02702702702703,2,NA
+"Chicken",1.5,2.02702702702703,2,"Chicken"
+"Hamburger",2,2.7027027027027,2,NA
+"Pizza",1,1.35135135135135,1,NA
+"PeriPeriChicken",1.5,2.02702702702703,2,NA
+"Nandos",1.5,2.02702702702703,2,NA
+"Eggs",3,4.05405405405406,4,"Eggs"
+"MatembaFish",1,1.35135135135135,1,"Clupeinae (Herring, Sardine, Sprat)"
+"Cannedtuna",1,1.35135135135135,1,"Scombridae (Bonito, Mackerel, Tuna)"
+"Darkbread",2,2.7027027027027,2,"Wheat bread"
+"Whitebread",2,2.7027027027027,2,"White bread"
+"WhiteRice",2,2.7027027027027,2,"Rice"
+"Samp",1,1.35135135135135,1,"Corn"
+"SadzaRapoko",1.66666666666667,2.25225225225225,2,"Corn"
+"ZviyoMhunga",1.66666666666667,2.25225225225225,2,"Sorghum"
+"MapfundeMugaiwa",1.66666666666667,2.25225225225225,2,"Millet"
+"MacaroniPastanosauce",1,1.35135135135135,1,"Pasta"
+"Cascade",1.66666666666667,2.25225225225225,2,NA
+"SoftDrinks",1.66666666666667,2.25225225225225,2,NA
+"Juice",1.66666666666667,2.25225225225225,2,NA
+"PeanutButter",3,4.05405405405406,4,"Peanut"
+"Sauces",1.5,2.02702702702703,2,NA
+"Dressing",1.5,2.02702702702703,2,NA

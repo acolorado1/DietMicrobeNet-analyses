@@ -1,0 +1,36 @@
+"food","score","raw_perc","perc","FooDB"
+"WholeMilk",0.8,1.23076923076923,1,"Milk (Cow)"
+"HodzekoAmasi",0.8,1.23076923076923,1,NA
+"Lacto",0.8,1.23076923076923,1,"Buttermilk"
+"GoatMilk",0.8,1.23076923076923,1,"Milk (Other mammals)"
+"SkimmedMilk",0.8,1.23076923076923,1,NA
+"Fries",1,1.53846153846154,1,"Potato"
+"Friedpotatoes",1,1.53846153846154,1,"Potato"
+"Roastedpotatoes",1,1.53846153846154,1,"Potato"
+"Sugarbeans",0.666666666666667,1.02564102564103,1,NA
+"Nyemba",0.666666666666667,1.02564102564103,1,"Cowpea"
+"Peas",0.666666666666667,1.02564102564103,1,"Common pea"
+"Beef",1,1.53846153846154,1,"Cattle (Beef, Veal)"
+"Pork",1,1.53846153846154,1,"Domestic pig"
+"FriedChicken",1,1.53846153846154,1,NA
+"Chicken",1,1.53846153846154,1,"Chicken"
+"Pizza",1,1.53846153846154,1,NA
+"Eggs",3,4.61538461538462,4,"Eggs"
+"MatembaFish",1,1.53846153846154,1,"Clupeinae (Herring, Sardine, Sprat)"
+"Cannedtuna",1,1.53846153846154,1,"Scombridae (Bonito, Mackerel, Tuna)"
+"Darkbread",2,3.07692307692308,3,"Wheat bread"
+"Whitebread",2,3.07692307692308,3,"White bread"
+"WhiteRice",1,1.53846153846154,1,"Rice"
+"SadzaRapoko",1.66666666666667,2.56410256410256,2,"Corn"
+"ZviyoMhunga",1.66666666666667,2.56410256410256,2,"Sorghum"
+"MapfundeMugaiwa",1.66666666666667,2.56410256410256,2,"Millet"
+"MacaroniPastanosauce",2,3.07692307692308,3,"Pasta"
+"Cascade",1.33333333333333,2.05128205128205,2,NA
+"SoftDrinks",1.33333333333333,2.05128205128205,2,NA
+"Juice",1.33333333333333,2.05128205128205,2,NA
+"Maheu",1.5,2.30769230769231,2,"Beer"
+"TraditionalBeer",1.5,2.30769230769231,2,"Beer"
+"PeanutButter",4,6.15384615384615,6,"Peanut"
+"Sauces",3,4.61538461538462,4,NA
+"Dressing",3,4.61538461538462,4,NA
+"Biscuits",1,1.53846153846154,1,NA
