@@ -18,4 +18,4 @@ These are all files references in the scripts associated with the Zimbabwe cohor
 - `noquote_ko_host`: List of host KOs 
 - `noquote_ko`: List of microbe KOs
 
-Every file here besidees `FFQ.csv` is used as an input in DM[H]N.  
+Every file here besides `FFQ.csv` is used as an input in DM[H]N.  
