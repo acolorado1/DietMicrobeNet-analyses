@@ -1,0 +1,40 @@
+"food","score","raw_perc","perc","FooDB"
+"Butter",2,2.56410256410257,2,"Butter"
+"Margarine",2,2.56410256410257,2,"Margarine"
+"Grapes",0.8,1.02564102564103,1,"Common grape"
+"Banana",0.8,1.02564102564103,1,"Banana"
+"Apple",0.8,1.02564102564103,1,"Apple"
+"Peaches",0.8,1.02564102564103,1,"Peach"
+"SugarCane",0.8,1.02564102564103,1,"Sugar"
+"Bakedbeans",1,1.28205128205128,1,"Common bean"
+"Cannedmushrooms",1,1.28205128205128,1,"Common mushroom"
+"GreenVegetables",1,1.28205128205128,1,NA
+"Fries",1,1.28205128205128,1,"Potato"
+"Friedpotatoes",1,1.28205128205128,1,"Potato"
+"Roastedpotatoes",1,1.28205128205128,1,"Potato"
+"Sugarbeans",1,1.28205128205128,1,NA
+"Nyemba",1,1.28205128205128,1,"Cowpea"
+"Peas",1,1.28205128205128,1,"Common pea"
+"Beef",2,2.56410256410257,2,"Cattle (Beef, Veal)"
+"Pork",2,2.56410256410257,2,"Domestic pig"
+"FriedChicken",1.5,1.92307692307692,1,NA
+"Chicken",1.5,1.92307692307692,1,"Chicken"
+"Eggs",4,5.12820512820513,5,"Eggs"
+"MatembaFish",1,1.28205128205128,1,"Clupeinae (Herring, Sardine, Sprat)"
+"Cannedtuna",1,1.28205128205128,1,"Scombridae (Bonito, Mackerel, Tuna)"
+"Darkbread",2,2.56410256410257,2,"Wheat bread"
+"Whitebread",2,2.56410256410257,2,"White bread"
+"WhiteRice",2,2.56410256410257,2,"Rice"
+"SadzaRapoko",1.66666666666667,2.13675213675214,2,"Corn"
+"ZviyoMhunga",1.66666666666667,2.13675213675214,2,"Sorghum"
+"MapfundeMugaiwa",1.66666666666667,2.13675213675214,2,"Millet"
+"MacaroniPastanosauce",2,2.56410256410257,2,"Pasta"
+"Cascade",1,1.28205128205128,1,NA
+"SoftDrinks",1,1.28205128205128,1,NA
+"Juice",1,1.28205128205128,1,NA
+"Maheu",1.5,1.92307692307692,1,"Beer"
+"TraditionalBeer",1.5,1.92307692307692,1,"Beer"
+"PeanutButter",3,3.84615384615385,3,"Peanut"
+"Cake",2,2.56410256410257,2,NA
+"Sweets",2,2.56410256410257,2,NA
+"Biscuits",4,5.12820512820513,5,NA

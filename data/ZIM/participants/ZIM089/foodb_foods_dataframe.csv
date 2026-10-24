@@ -1,0 +1,28 @@
+"id","name","name_scientific","food_frequency"
+16,"Peanut","Arachis hypogaea",3
+105,"Apple","Malus pumila",1
+125,"Rice","Oryza sativa",2
+126,"Millet","Panicum miliaceum",2
+134,"Common bean","Phaseolus vulgaris",1
+141,"Common pea","Pisum sativum",1
+149,"Peach","Prunus persica",1
+175,"Potato","Solanum tuberosum",3
+177,"Sorghum","Sorghum bicolor",2
+202,"Cowpea","Vigna unguiculata",1
+204,"Common grape","Vitis vinifera",1
+205,"Corn","Zea mays",2
+208,"Banana","Musa acuminata",1
+268,"Beer",NA,2
+274,"Pasta",NA,2
+334,"Chicken","Gallus gallus",1
+506,"Cattle (Beef, Veal)","Bos taurus",2
+531,"Clupeinae (Herring, Sardine, Sprat)","Clupeinae",1
+549,"Domestic pig","Sus scrofa domestica",2
+561,"Common mushroom","Agaricus bisporus",1
+600,"Scombridae (Bonito, Mackerel, Tuna)","Scombridae",1
+633,"Eggs",NA,5
+667,"Butter",NA,2
+670,"Sugar",NA,1
+836,"Wheat bread",NA,2
+872,"Margarine",NA,2
+1019,"White bread",NA,2

@@ -1,0 +1,23 @@
+"id","name","name_scientific","food_frequency"
+12,"Pineapple","Ananas comosus",1
+16,"Peanut","Arachis hypogaea",8
+54,"Lemon","Citrus limon",1
+56,"Mandarin orange (Clementine, Tangerine)","Citrus reticulata",1
+57,"Sweet orange","Citrus sinensis",1
+76,"Loquat","Eriobotrya japonica",1
+81,"Fig","Ficus carica",1
+106,"Mango","Mangifera indica",1
+125,"Rice","Oryza sativa",6
+126,"Millet","Panicum miliaceum",4
+135,"Date","Phoenix dactylifera",1
+141,"Common pea","Pisum sativum",2
+150,"Guava","Psidium guajava",1
+175,"Potato","Solanum tuberosum",3
+177,"Sorghum","Sorghum bicolor",4
+202,"Cowpea","Vigna unguiculata",2
+205,"Corn","Zea mays",5
+531,"Clupeinae (Herring, Sardine, Sprat)","Clupeinae",2
+600,"Scombridae (Bonito, Mackerel, Tuna)","Scombridae",2
+633,"Eggs",NA,1
+667,"Butter",NA,1
+872,"Margarine",NA,1
