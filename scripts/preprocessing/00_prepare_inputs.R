@@ -103,6 +103,7 @@ if (run_zim) {
     ffq <- ffq_to_foodb(zim_ffq, pid = pid, food_eq = food_eq, ffq_cols = ffq_cols)
     write.csv(ffq, file = file.path(pid_dir, "FFQ.csv"), row.names = FALSE)
 
+    # this does not need to run again since the OG df is redundant
     og_file <- file.path(pid_dir, "foodb_foods_dataframe_og.csv")
     if (file.exists(og_file)) {
       foodb_df <- add_ffq_frequencies(ffq, read_csv(og_file, show_col_types = FALSE), pid = pid)

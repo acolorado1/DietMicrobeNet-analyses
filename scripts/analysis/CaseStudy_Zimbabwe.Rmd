@@ -53,10 +53,10 @@ hmdb       <- read_hmdb(hmdb_path)
 kegg_names <- kegg_compound_names("data/cache/kegg_compound_names.rds")
 
 sampleids <- c(
-  "ZIM089", "ZIM098", "ZIM106", "ZIM116", "ZIM125", "ZIM130", "ZIM139", "ZIM153", "ZIM160",
-  "ZIM091", "ZIM100", "ZIM110", "ZIM117", "ZIM126", "ZIM132", "ZIM143", "ZIM155", "ZIM161",
+  "ZIM089", "ZIM098", "ZIM106", "ZIM125", "ZIM130", "ZIM139", "ZIM153", "ZIM160",
+  "ZIM091", "ZIM110", "ZIM126", "ZIM132", "ZIM143", "ZIM155", "ZIM161",
   "ZIM094", "ZIM103", "ZIM111", "ZIM120", "ZIM127", "ZIM137", "ZIM146", "ZIM158", "ZIM162",
-  "ZIM095", "ZIM105", "ZIM113", "ZIM123", "ZIM129", "ZIM138", "ZIM147", "ZIM159", "ZIM166"
+  "ZIM095", "ZIM105", "ZIM123", "ZIM129", "ZIM138", "ZIM147", "ZIM159", "ZIM166"
 )
 setdiff(sampleids, metadata$PID)
 
