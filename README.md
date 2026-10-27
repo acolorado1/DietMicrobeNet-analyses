@@ -10,6 +10,7 @@ DietMicrobeNet-analyses/
 │   ├── ZIM/                              Zimbabwe cohort
 │   ├── DM/                               Diet Modification cohort
 │   ├── IBD/                              IBDMDB subset (benchmarking only)
+│   ├── host_genome/                      human-genome KO list shared by 
 │   └── benchmarking/                     benchmark results                          [TBD]
 └── scripts/
     ├── R/
