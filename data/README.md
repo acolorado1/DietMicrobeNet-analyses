@@ -13,3 +13,7 @@ Each directory contains data used to run DM[H]N for a different study:
   - Lloyd-Price, J., Arze, C., Ananthakrishnan, A. N., et al. (2019). Multi-omics of the gut microbial ecosystem in inflammatory bowel diseases. *Nature, 569*, 655–662. https://doi.org/10.1038/s41586-019-1237-9
 
 Each cohort directory contains a `participants` file with information about individual participants. Because DM[H]N operates on a per-sample basis, participant information is associated with the corresponding samples. Each cohort directory may also contain additional files specific to that study.
+
+## Additional directories 
+
+- **`host_genome`**: contains list of host (human) associated KOs from KEGG
