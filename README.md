@@ -53,8 +53,6 @@ IBD participants are each participant's earliest timepoint with metagenome, meta
 
 DM[H]N is run from the DietMicrobeNet repository on each participant folder.
 
-`scripts/preprocessing/01_run_dmhn_benchmark.sh` runs every IBD pair folder through `run_workflow_benchmark.py`, which records runtime and peak memory in `data/benchmarking/benchmark_IBD.csv`. Set `DMN_DIR` at the top to your DietMicrobeNet repository and run it from the DietMicrobeNet run-workflow directory.
-
 ### 3. Collapse outputs: `scripts/preprocessing/02_collapse_outputs.R`
 
 DM[H]N writes many large files per participant; the analyses only need `graph/graph_results.csv`, plus `graph/network_summary.txt` for benchmarking. This script:
