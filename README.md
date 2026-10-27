@@ -8,27 +8,9 @@ Analyses of [DietMicrobe[Host]Net (DM[H]N)](https://github.com/lozuponelab/DietM
 DietMicrobeNet-analyses/
 ├── data/
 │   ├── ZIM/                              Zimbabwe cohort
-│   │   ├── Zim_KOs.tsv                   HUMAnN KO x taxonomy table
-│   │   ├── FoodEquivalents.xlsx          FFQ items -> FooDB foods
-│   │   ├── zim2_baseline.txt             baseline metadata and FFQ
-│   │   ├── zim2_longitudinal.txt         immune markers by visit
-│   │   └── participants/ZIM###/          DM[H]N inputs per participant
 │   ├── DM/                               Diet Modification cohort
-│   │   ├── DM_KOs_shotgun.tsv            HUMAnN KO x taxonomy table (shotgun)
-│   │   ├── DM_KOs_rnaseq.txt             HUMAnN KO table (RNA-seq)
-│   │   ├── host_gene_counts_tpm.csv      host gene expression
-│   │   ├── metadata.xlsx                 diet arm and clinical markers by week
-│   │   ├── agrarian_foodb.xlsx           FooDB foods, agrarian diet
-│   │   ├── western_foodb.xlsx            FooDB foods, western diet
-│   │   └── participants/DM###.1/         DM[H]N inputs per participant
 │   ├── IBD/                              IBDMDB subset (benchmarking only)
-│   │   ├── metadata.csv                  HMP2 metadata
-│   │   ├── sub_metaG.tsv                 EC x taxonomy, metagenomes
-│   │   ├── sub_metaT.tsv                 EC x taxonomy, metatranscriptomes
-│   │   ├── host_tx_counts.tsv            host transcriptome counts
-│   │   └── participants/<ID>_week<N>/    hg_mgx, hg_mtx, htx_mgx, htx_mtx inputs
-│   ├── host_genome/                      human-genome KO list shared by all studies
-│   └── benchmarking/                     benchmark results
+│   └── benchmarking/                     benchmark results                          [TBD]
 └── scripts/
     ├── R/
     │   └── functions.R                   shared functions
