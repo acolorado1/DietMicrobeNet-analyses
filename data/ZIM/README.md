@@ -8,6 +8,7 @@ These are all files references in the scripts associated with the Zimbabwe cohor
 - `zim2_baseline.txt`: Baseline metadata (see publication)
 - `zim2_longitudinal.txt`: Metadata containing paired longitudinal data (see publication)
 - `FoodEquivalents.xlsx`: Original Zimbabwe FFQ foods items and their FooDB equivalents 
+- `graph_results_ZIM.csv.gz`: aggregated graph_results.csv (DM[H]N output) across all samples
 
 ## Per participant files 
 
