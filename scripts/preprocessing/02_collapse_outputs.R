@@ -26,7 +26,7 @@ include_ibd <- FALSE   # IBD collapse + benchmark rows
 # =============================================================================
 collapse_graph_results(zim_dir,
                        "data/ZIM/graph_results_ZIM.csv.gz",
-                       outputs = c("output_dm", "output_dm_ALL", "output_dmh_ALL"))
+                       outputs = c("output_dm", "output_dm_ALL"))
 
 collapse_graph_results(file.path(dm_dir, "participants"),
                        "data/DM/graph_results_DM.csv.gz",
