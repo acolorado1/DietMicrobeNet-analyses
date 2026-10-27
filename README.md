@@ -1,6 +1,6 @@
 # DietMicrobeNet-analyses
 
-Analyses of (DietMicrobe[Host]Net (DM[H]N))[https://github.com/lozuponelab/DietMicrobeNet] networks in two case-study cohorts (Zimbabwe and Diet Modification), and a benchmark of DM[H]N runtime and memory across the Zimbabwe, Diet Modification and IBD datasets.
+Analyses of [DietMicrobe[Host]Net (DM[H]N)](https://github.com/lozuponelab/DietMicrobeNet) networks in two case-study cohorts (Zimbabwe and Diet Modification), and a benchmark of DM[H]N runtime and memory across the Zimbabwe, Diet Modification and IBD datasets.
 
 ## Repository layout
 
