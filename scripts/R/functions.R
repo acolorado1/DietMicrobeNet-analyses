@@ -33,45 +33,55 @@ suppressPackageStartupMessages({
 # Split a HUMAnN "KO|taxonomy" table and write, for each sample column,
 #   <out_root>/<dir name>/ko_taxonomy_abundance.csv  (KO, taxonomy, Abundance_RPKs)
 #   <out_root>/<dir name>/noquote_ko.txt             (unique KOs)
-# UNGROUPED / UNMAPPED rows, rows without taxonomy and zero abundances are
-# dropped. Returns tibble(sample_col, dir).
+# Dropped: blank, UNGROUPED and UNMAPPED rows, rows without taxonomy, and
+# zero or missing abundances. Returns tibble(sample_col, dir, n_rows, n_missing).
 write_participant_ko_dirs <- function(ko_table, out_root,
                                       dir_names = names(ko_table)[-1],
                                       quote = FALSE) {
   sample_cols <- names(ko_table)[-1]
   stopifnot(length(dir_names) == length(sample_cols))
-
-  gf <- ko_table[[1]]
-  drop <- str_detect(gf, "UNGROUPED") | gf == "UNMAPPED" | startsWith(gf, "UNMAPPED|")
-  ko_table <- ko_table[!drop, ]
-
+  
+  gf   <- ko_table[[1]]
+  keep <- !is.na(gf) & gf != "" &
+    !str_detect(gf, "UNGROUPED") & gf != "UNMAPPED" & !startsWith(gf, "UNMAPPED|")
+  ko_table <- ko_table[which(keep), ]
+  
   split_gf <- strsplit(ko_table[[1]], "|", fixed = TRUE)
   KO       <- vapply(split_gf, `[`, character(1), 1)
   taxonomy <- vapply(split_gf, function(x) if (length(x) > 1) x[2] else "", character(1))
-
-  has_tax  <- taxonomy != ""
+  
+  has_tax  <- which(!is.na(taxonomy) & taxonomy != "")
   KO       <- KO[has_tax]
   taxonomy <- taxonomy[has_tax]
   ko_table <- ko_table[has_tax, ]
-
+  
   dirs <- file.path(out_root, dir_names)
+  n_rows <- n_missing <- integer(length(sample_cols))
   for (i in seq_along(sample_cols)) {
-    abundance <- ko_table[[sample_cols[i]]]
-    nonzero   <- abundance != 0
-
+    abundance    <- suppressWarnings(as.numeric(ko_table[[sample_cols[i]]]))
+    n_missing[i] <- sum(is.na(abundance))
+    present      <- which(!is.na(abundance) & abundance != 0)
+    
     sample_tbl <- data.frame(
-      KO             = KO[nonzero],
-      taxonomy       = taxonomy[nonzero],
-      Abundance_RPKs = abundance[nonzero],
+      KO             = KO[present],
+      taxonomy       = taxonomy[present],
+      Abundance_RPKs = abundance[present],
       stringsAsFactors = FALSE
     )
-
+    n_rows[i] <- nrow(sample_tbl)
+    
     dir.create(dirs[i], showWarnings = FALSE, recursive = TRUE)
     write.csv(sample_tbl, file = file.path(dirs[i], "ko_taxonomy_abundance.csv"),
               row.names = FALSE, quote = quote)
     writeLines(unique(sample_tbl$KO), con = file.path(dirs[i], "noquote_ko.txt"))
   }
-  invisible(tibble(sample_col = sample_cols, dir = dirs))
+  
+  if (any(n_missing > 0)) {
+    message("Missing abundances dropped (blank, NA or non-numeric) in ",
+            sum(n_missing > 0), " of ", length(sample_cols), " samples, ",
+            sum(n_missing), " values in total. Check the table with readr::problems().")
+  }
+  invisible(tibble(sample_col = sample_cols, dir = dirs, n_rows = n_rows, n_missing = n_missing))
 }
 
 # Host (human genome) KO list -> abundance table with a placeholder abundance
